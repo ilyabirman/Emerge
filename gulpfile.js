@@ -33,13 +33,15 @@ gulp.task ('sass', function () {
 gulp.task ('uglify', function () {
   gulp.src (['emerge.js'])
     .pipe (uglify ())
-    .pipe(gulp.dest('release/'))
+    .pipe(gulp.dest('../release/'))
 })
 
+/*
 gulp.task ('svgo', function () {
   gulp.src (['ring.svg'])
     .pipe (svgo ())
-    .pipe(gulp.dest('release/'))
+    .pipe(gulp.dest('../release/'))
 })
+*/
 
-gulp.task ('default', ['uglify', 'svgo'])
+gulp.task ('default', ['uglify'])

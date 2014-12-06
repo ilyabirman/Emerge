@@ -56,8 +56,8 @@ if (jQuery) {
           return false
         }
         
-        var spinner = $el.data ('_spinner')
-        if (spinner) { spinner.stop ()}
+        var $spinElement = $el.data ('_spinner')
+        if ($spinElement) { $spinElement.hide ()}
         
         $el.css ('transition', 'opacity ' + defaultDuration + 'ms ease-out')
         $el.css ('opacity', '1')
@@ -122,7 +122,6 @@ if (jQuery) {
       $ ('.emerge').each (function () {
     
         var $self = $ (this)
-        var $spinElement = false
         var innerImagesSrcs = {}
         var spin = false
         var spinner = false
@@ -296,47 +295,15 @@ if (jQuery) {
         
         if (Object.keys (innerImagesSrcs).length > 0) if (spin = $self.data ('spin')) {
 
-            $spinElement = $ ('.emerge-spinner').clone ()
-            $spinElement.css ({
+            var $spinElement = $ ('.emerge-spinner').clone ().css ({
               'position': 'absolute',
               'display': 'block',
-              // 'border': '#f00 solid 1px',
               'width': $self.width (),
               'height': Math.min ($self.height (), document.body.clientHeight - $self.offset ().top)
             })
 
             $self.before ($spinElement)
-            $self.data ('_spinner', spinner)
-
-          /*
-          
-          try {
-            
-            spinner = new Spinner ({
-              lines: 12,
-              length: 4,
-              width: 2,
-              radius: 8,
-              corners: 0,
-              rotate: 0,
-              color: 'rgba(96, 96, 96, .75)',
-              hwaccel: true
-            })
-            
-            $spinElement = $ ('<div />')
-            $spinElement.css ({
-              'position': 'absolute',
-              // 'border': '#f00 solid 1px',
-              'width': $self.width (),
-              'height': Math.min ($self.height (), document.body.clientHeight - $self.offset ().top)
-            })
-
-            $self.before ($spinElement)
-            spinner.spin ($spinElement[0])
-            $self.data ('_spinner', spinner)
-            
-          } catch (e) {}
-          */
+            $self.data ('_spinner', $spinElement)
         
         }
         
