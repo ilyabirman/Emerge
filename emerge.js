@@ -295,6 +295,20 @@ if (jQuery) {
         // start spinner, if necessary and possible
         
         if (Object.keys (innerImagesSrcs).length > 0) if (spin = $self.data ('spin')) {
+
+            $spinElement = $ ('.emerge-spinner').clone ()
+            $spinElement.css ({
+              'position': 'absolute',
+              'display': 'block',
+              // 'border': '#f00 solid 1px',
+              'width': $self.width (),
+              'height': Math.min ($self.height (), document.body.clientHeight - $self.offset ().top)
+            })
+
+            $self.before ($spinElement)
+            $self.data ('_spinner', spinner)
+
+          /*
           
           try {
             
@@ -322,6 +336,7 @@ if (jQuery) {
             $self.data ('_spinner', spinner)
             
           } catch (e) {}
+          */
         
         }
         
