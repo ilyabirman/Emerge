@@ -7,9 +7,6 @@ var gulp = require('gulp');
 
 var uglify = require('gulp-uglify');
 var svgo = require('gulp-svgo');
-/*
-var postcss = require('gulp-postcss');
-var sass = require('gulp-sass');
 
 gulp.task ('sass', function () {
   gulp.src (['sass/*.scss', '!sass/_*.scss'])
@@ -27,8 +24,7 @@ gulp.task ('sass', function () {
       })
     ]))
     .pipe(gulp.dest('styles/'))
-});
-*/
+})
 
 gulp.task ('uglify', function () {
   gulp.src (['emerge.js'])
@@ -36,12 +32,10 @@ gulp.task ('uglify', function () {
     .pipe(gulp.dest('../release/'))
 })
 
-/*
 gulp.task ('svgo', function () {
-  gulp.src (['ring.svg'])
+  gulp.src (['../ring.svg'])
     .pipe (svgo ())
-    .pipe(gulp.dest('../release/'))
+    .pipe(gulp.dest('../'))
 })
-*/
 
-gulp.task ('default', ['uglify'])
+gulp.task ('default', ['uglify', 'svgo'])
