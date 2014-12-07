@@ -1,4 +1,4 @@
-// 0.9.4
+// 1.1
 
 if (jQuery) {
   
@@ -33,15 +33,17 @@ if (jQuery) {
       ]
       var cssUrlRegex = /url\(\s*(['"]?)(.*?)\1\s*\)/g
 
-      var spinnerCode = function (radius, color, backwards) {
+      var spinnerCode = function (radius, color, backwards, period, fadeDuration) {
         return (
-          '<div style="position: absolute">' +
+          '<div style="position: absolute; transition: opacity ' + fadeDuration + 'ms ease-out">' +
           '<div style="position: absolute; left: 50%; top: 50%; margin: -' + radius + 'px">'+
           '<svg xmlns="http://www.w3.org/2000/svg" width="' + (radius*2) + '" height="' + (radius*2) + '"' +
           'viewBox="0 0 24 24">' +
           '<path fill="'+ color +'" d="M17.25 1.5c-.14-.06-.28-.11-.44-.11-.55 0-1 .45-1 1 0 .39.23.72.56.89l-.01.01c3.2 1.6 5.39 4.9 5.39 8.71 0 5.38-4.37 9.75-9.75 9.75S2.25 17.39 2.25 12c0-3.82 2.2-7.11 5.39-8.71v-.02c.33-.16.56-.49.56-.89 0-.55-.45-1-1-1-.16 0-.31.05-.44.11C2.9 3.43.25 7.4.25 12c0 6.49 5.26 11.75 11.75 11.75S23.75 18.49 23.75 12c0-4.6-2.65-8.57-6.5-10.5z">' +
             '<animateTransform attributeName="transform" type="rotate" ' +
-            'from="' + (backwards*360) + ' 12 12" to="' + (!backwards*360) + ' 12 12" dur="1.33s" repeatCount="indefinite" />' + 
+            'from="' + (backwards*360) + ' 12 12" to="' + (!backwards*360) + ' 12 12" ' +
+            'dur="' + period + 'ms" repeatCount="indefinite"' + 
+            ' />' + 
           '</path>' + 
           '</svg>' + 
           '</div>' + 
@@ -74,7 +76,7 @@ if (jQuery) {
         }
         
         var $spinElement = $el.data ('_spinner')
-        if ($spinElement) { $spinElement.hide ()}
+        if ($spinElement) { $spinElement.css ('opacity', 0)}
         
         $el.css ('transition', 'opacity ' + defaultDuration + 'ms ease-out')
         $el.css ('opacity', '1')
@@ -141,7 +143,11 @@ if (jQuery) {
         var $self = $ (this)
         var innerImagesSrcs = {}
         var spin = false
-        var spinner = false
+        var spinnerRadius = 12
+        var spinnerPeriod = 1333
+        var spinnerColor = '#404040'
+        var spinnerBackwards = 0
+        var spinnerFadeDuration = defaultDuration
         var elementsCount = 0
         var elementsLoaded = 0
         var style1 = ''
@@ -184,7 +190,7 @@ if (jQuery) {
     
         effect = $self.data ('effect') || false
         duration = $self.data ('duration') || defaultDuration
-    
+
         if (effect) {
     
           var fxData = {}
@@ -319,7 +325,18 @@ if (jQuery) {
             //   'height': Math.min ($self.height (), document.body.clientHeight - $self.offset ().top)
             // })
 
-            var $spinElement = $ (spinnerCode (12, '#404040', 0)).css ({
+            if ($self.data ('spin-size')) spinnerRadius = $self.data ('spin-size') / 2
+            if ($self.data ('spin-color')) spinnerColor = $self.data ('spin-color')
+            if ($self.data ('spin-period')) spinnerPeriod = $self.data ('spin-period')
+            if ($self.data ('spin-direction')) spinnerBackwards = (
+              ($self.data ('spin-direction') == 'clockwise') ? 0:1
+            )
+
+            spinnerFadeDuration = duration
+
+            var $spinElement = $ (
+              spinnerCode (spinnerRadius, spinnerColor, spinnerBackwards, spinnerPeriod, spinnerFadeDuration)
+            ).css ({
               'width': $self.width (),
               'height': Math.min ($self.height (), document.body.clientHeight - $self.offset ().top)
             })
