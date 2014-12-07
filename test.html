@@ -2,6 +2,7 @@
 
 <head>
   <script src="jquery/jquery.js"></script>
+  <script src="spin/spin.js"></script>
   <script src="emerge.js"></script>
 </head>
 
@@ -21,14 +22,36 @@
 
 <p>
   <img
-    class="emerge" data-hold="2000" data-continue="true" data-spin="true" data-spin-size="64" data-spin-direction="counter-clockwise" data-spin-period="333" data-spin-element="my-awesome-spinner"
+    class="emerge" data-hold="2000" data-continue="true" data-spin="true" data-spin-size="64" data-spin-direction="counter-clockwise" data-spin-period="333" data-spin-element="spinjs-spinner"
     src="http://ilyabirman.ru/i/ib-180x220px.jpg"
     width="180"
     height="220"
   />
 </p>
 
-<div id="my-awesome-spinner" style="display: none">
+<div id="spinjs-spinner" style="display: none">
+  <div style="position: absolute; left: 50%; top: 50%; margin: -8px">
+  </div>
+</div>
+
+<script>
+
+  var spinner = new Spinner ({
+    lines: 12,
+    length: 4,
+    width: 2,
+    radius: 8,
+    corners: 0,
+    rotate: 0,
+    color: 'rgba(96, 96, 96, .75)',
+    hwaccel: true
+  })
+
+  spinner.spin ($ ('#spinjs-spinner div')[0])
+
+</script>
+
+<div id="awesome-spinner" style="display: none">
 <svg width="45" height="45" viewBox="0 0 45 45" xmlns="http://www.w3.org/2000/svg" stroke="#000" style="position: absolute; left: 50%; top: 50%; margin: -22.5px">
     <g fill="none" fill-rule="evenodd" transform="translate(1 1)" stroke-width="2">
         <circle cx="22" cy="22" r="6" stroke-opacity="0">
