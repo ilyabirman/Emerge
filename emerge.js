@@ -33,7 +33,22 @@ if (jQuery) {
       ]
       var cssUrlRegex = /url\(\s*(['"]?)(.*?)\1\s*\)/g
 
-      var defaultSpinnerHTML = '<div style="position: absolute"><div style="position: absolute; left: 50%; top: 50%; margin: -12px"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#fff" d="M0 0h24v24H0z"/><path fill="#404040" d="M17.25 1.5c-.14-.06-.28-.11-.44-.11-.55 0-1 .45-1 1 0 .39.23.72.56.89l-.01.01c3.2 1.6 5.39 4.9 5.39 8.71 0 5.38-4.37 9.75-9.75 9.75S2.25 17.39 2.25 12c0-3.82 2.2-7.11 5.39-8.71v-.02c.33-.16.56-.49.56-.89 0-.55-.45-1-1-1-.16 0-.31.05-.44.11C2.9 3.43.25 7.4.25 12c0 6.49 5.26 11.75 11.75 11.75S23.75 18.49 23.75 12c0-4.6-2.65-8.57-6.5-10.5z"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1.33s" repeatCount="indefinite" /></path></svg></div></div>'
+      var spinnerCode = function (radius, color, backwards) {
+        return (
+          '<div style="position: absolute">' +
+          '<div style="position: absolute; left: 50%; top: 50%; margin: -' + radius + 'px">'+
+          '<svg xmlns="http://www.w3.org/2000/svg" width="' + (radius*2) + '" height="' + (radius*2) + '"' +
+          'viewBox="0 0 24 24">' +
+          '<path fill="'+ color +'" d="M17.25 1.5c-.14-.06-.28-.11-.44-.11-.55 0-1 .45-1 1 0 .39.23.72.56.89l-.01.01c3.2 1.6 5.39 4.9 5.39 8.71 0 5.38-4.37 9.75-9.75 9.75S2.25 17.39 2.25 12c0-3.82 2.2-7.11 5.39-8.71v-.02c.33-.16.56-.49.56-.89 0-.55-.45-1-1-1-.16 0-.31.05-.44.11C2.9 3.43.25 7.4.25 12c0 6.49 5.26 11.75 11.75 11.75S23.75 18.49 23.75 12c0-4.6-2.65-8.57-6.5-10.5z">' +
+            '<animateTransform attributeName="transform" type="rotate" ' +
+            'from="' + (backwards*360) + ' 12 12" to="' + (!backwards*360) + ' 12 12" dur="1.33s" repeatCount="indefinite" />' + 
+          '</path>' + 
+          '</svg>' + 
+          '</div>' + 
+          '</div>'
+        )
+      }
+
     
       if (window.navigator && (window.navigator.loadPurpose === 'preview')) {
         $ ('.emerge').css ('transition', 'none')
@@ -304,7 +319,7 @@ if (jQuery) {
             //   'height': Math.min ($self.height (), document.body.clientHeight - $self.offset ().top)
             // })
 
-            var $spinElement = $ (defaultSpinnerHTML).css ({
+            var $spinElement = $ (spinnerCode (12, '#404040', 0)).css ({
               'width': $self.width (),
               'height': Math.min ($self.height (), document.body.clientHeight - $self.offset ().top)
             })
