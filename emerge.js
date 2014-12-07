@@ -318,25 +318,38 @@ if (jQuery) {
         
         if (Object.keys (innerImagesSrcs).length > 0) if (spin = $self.data ('spin')) {
 
-            // var $spinElement = $ ('.emerge-spinner').clone ().css ({
-            //   'position': 'absolute',
-            //   'display': 'block',
-            //   'width': $self.width (),
-            //   'height': Math.min ($self.height (), document.body.clientHeight - $self.offset ().top)
-            // })
+            var customSpinnerID = $self.data ('spin-element')
 
-            if ($self.data ('spin-size')) spinnerRadius = $self.data ('spin-size') / 2
-            if ($self.data ('spin-color')) spinnerColor = $self.data ('spin-color')
-            if ($self.data ('spin-period')) spinnerPeriod = $self.data ('spin-period')
-            if ($self.data ('spin-direction')) spinnerBackwards = (
-              ($self.data ('spin-direction') == 'clockwise') ? 0:1
-            )
+            if (customSpinnerID) {
 
-            spinnerFadeDuration = duration
+              // use custom spinner
 
-            var $spinElement = $ (
-              spinnerCode (spinnerRadius, spinnerColor, spinnerBackwards, spinnerPeriod, spinnerFadeDuration)
-            ).css ({
+              var $spinElement = $ ('#' + customSpinnerID).clone ().css ({
+                'position': 'absolute',
+                'display': 'block'
+              })
+
+
+            } else {
+
+              // use built-in spinner
+
+              if ($self.data ('spin-size')) spinnerRadius = $self.data ('spin-size') / 2
+              if ($self.data ('spin-color')) spinnerColor = $self.data ('spin-color')
+              if ($self.data ('spin-period')) spinnerPeriod = $self.data ('spin-period')
+              if ($self.data ('spin-direction')) spinnerBackwards = (
+                ($self.data ('spin-direction') == 'clockwise') ? 0:1
+              )
+
+              spinnerFadeDuration = duration
+
+              var $spinElement = $ (
+                spinnerCode (spinnerRadius, spinnerColor, spinnerBackwards, spinnerPeriod, spinnerFadeDuration)
+              )
+
+            }
+
+            $spinElement.css ({
               'width': $self.width (),
               'height': Math.min ($self.height (), document.body.clientHeight - $self.offset ().top)
             })
