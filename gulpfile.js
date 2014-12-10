@@ -7,7 +7,9 @@ var gulp = require('gulp');
 
 var uglify = require('gulp-uglify');
 var svgo = require('gulp-svgo');
+var replace = require ('gulp-replace')  // https://www.npmjs.com/package/gulp-replace/
 
+/*
 gulp.task ('sass', function () {
   gulp.src (['sass/*.scss', '!sass/_*.scss'])
     .pipe (sass ({
@@ -25,17 +27,20 @@ gulp.task ('sass', function () {
     ]))
     .pipe(gulp.dest('styles/'))
 })
+*/
 
 gulp.task ('uglify', function () {
   gulp.src (['emerge.js'])
-    .pipe (uglify ())
-    .pipe(gulp.dest('../release/'))
+    .pipe (replace (/^( *).*\/\/\:dev.*$/gm, '$1// dev code removed //'))
+    .pipe (gulp.dest ('../verify/'))
+    .pipe (uglify ({preserveComments: 'some'}))
+    .pipe (gulp.dest ('../release/'))
 })
 
 gulp.task ('svgo', function () {
   gulp.src (['../ring.svg'])
     .pipe (svgo ())
-    .pipe(gulp.dest('../'))
+    .pipe (gulp.dest ('../'))
 })
 
-gulp.task ('default', ['uglify', 'svgo'])
+gulp.task ('default', ['uglify'])

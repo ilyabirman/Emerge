@@ -1,4 +1,4 @@
-// 1.1
+//! v.1.1, http://ilyabirman.net/projects/emerge/
 
 if (jQuery) {
   
@@ -73,6 +73,10 @@ if (jQuery) {
         return false
       }
       
+      var log = function (txt) {  //:dev
+        if (1) console.log (txt)  //:dev
+      }                           //:dev
+
       // plays the actual animation
       var fire = function ($el, shouldGo) {
     
@@ -80,13 +84,16 @@ if (jQuery) {
         
         if (hold && !$el.data ('_holding')) {
           $el.data ('_holding', true)
+          log ('  hold: ' + $el[0].id + ' (' + hold + ' ms)') //:dev
           setTimeout (function () {
+            log ('TIME') //:dev
             fire ($el, true)
           }, hold)
           return false
         }
         
         if ($el.data ('_holding') && !shouldGo) {
+          log (' onhold: ' + $el[0].id) //:dev
           return false
         }
         
@@ -101,6 +108,7 @@ if (jQuery) {
           $el.attr ('style', $el.attr ('style') + '; '  + style2)
         }
     
+        log ('  FIRED! ' + $el[0].id) //:dev
         $el.data ('_fired', true)
     
         arm ()
@@ -110,8 +118,19 @@ if (jQuery) {
       // checks the queue and emerges the elements that should go
       var arm = function ($which) {
         if ($which) {
+          log ('ARM:     ' + $which[0].id) //:dev
           queue.push ($which)
+        } else { //:dev
+          log ('ARM') //:dev
         }
+
+        /*
+        var queueStr = '' //:dev
+        for (var i in queue) { //:dev
+          queueStr += queue[i][0].id + ' ' //:dev
+        } //:dev
+        log ('  queue: ' + queueStr) //:dev
+        */
 
         for (var i in queue) {
           var $el = queue[i]
@@ -125,11 +144,18 @@ if (jQuery) {
             
             if ($test_el = $el.data ('_waitFor')) {
     
+              if (!$el.data ('_holding')) {    //:dev 
+                log ('  waits: ' + $el[0].id)  //:dev
+              }                                //:dev
+
               // check for a deadlock
               while (1) {
                 if (!$test_el.data ('_fired')) {
+
+                  log ('     for ' + $test_el[0].id) //:dev
                   
-                  if ($test_el[0].id == $el[0].id) {
+                  if ($test_el[0] == $el[0]) {
+                    log ('  FUCK, WE HAVE A DEADLOCK!') //:dev
                     deadlock = true
                     break
                   }
@@ -151,7 +177,9 @@ if (jQuery) {
           
         }
         
-              }
+        log ('IDLE') //:dev
+
+      }
       
       $ ('.emerge').each (function () {
     
@@ -182,6 +210,10 @@ if (jQuery) {
             $self.data ('_waitFor', $ ('#' + $self.data ('await')))
           }
           
+          if ($self.data ('_waitFor')) { //:dev
+            log ('         ' + $self[0].id + ' will wait for ' + $self.data ('_waitFor')[0].id) //:dev
+          } //:dev
+
           arm ($self)
           
         }
@@ -377,6 +409,7 @@ if (jQuery) {
         
         // wait for all inner images
         for (var i in innerImagesSrcs) {
+          log ('image to load: ' + i) //:dev
           var imageToWaitFor = new Image ()
           imageToWaitFor.src = i
           elementsCount ++
