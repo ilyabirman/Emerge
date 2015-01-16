@@ -1,4 +1,4 @@
-//! v.1.1, http://ilyabirman.net/projects/emerge/
+//! v.1.1.1, http://ilyabirman.net/projects/emerge/
 
 if (jQuery) {
   
@@ -397,7 +397,7 @@ if (jQuery) {
             }
 
             $spinElement.css ({
-              'width': $self.width (),
+              'width': '100%',//$self.width (),
               'height': Math.min ($self.height (), document.body.clientHeight - $self.offset ().top)
             })
 
