@@ -1,4 +1,4 @@
-//! v.1.1.1, http://ilyabirman.net/projects/emerge/
+//! v.1.1.2, http://ilyabirman.net/projects/emerge/
 
 if (jQuery) {
   
@@ -250,7 +250,7 @@ if (jQuery) {
           var down = $self.data ('down') || 0
           var left = $self.data ('left') || 0
           var right = $self.data ('right') || 0
-          var angle = $self.data ('angle') || '0'
+          var angle = $self.data ('angle') || '90'
           var scale = $self.data ('scale') || -1
           var origin = $self.data ('origin') || '50% 50%'
     
