@@ -24,6 +24,7 @@ if (jQuery) {
       var queue = []
       var defaultDuration = 500
       var $prev = false
+      var watchingScrolling = false
       var cssImageProps = [
         'backgroundImage',
         'borderImage',
@@ -65,7 +66,6 @@ if (jQuery) {
           '</div>'
         )
       }
-
     
       if (window.navigator && (window.navigator.loadPurpose === 'preview')) {
         $ ('.emerge').css ('transition', 'none')
@@ -77,26 +77,50 @@ if (jQuery) {
         if (1) console.log (txt)  //:dev
       }                           //:dev
 
-      // plays the actual animation
+      var withinView = function ($el) {
+        // log (' noview: ' + $el[0].id) //:dev
+        // log ('window height = ' + document.body.clientHeight) //:dev
+        // log ('element top = ' + ($el.offset ().top - document.body.scrollTop)) //:dev
+        return (
+          ($el.offset ().top - document.body.scrollTop)
+          < document.body.clientHeight
+        )
+      }
+
+      // calling fire means:
+      // element $el is has all content loaded and can be shown,
+      // also there is no other element that prevents it from being shown,
+      // so check if it has its own limitations like hold timeout or scrolling
       var fire = function ($el, shouldGo) {
     
         var hold = $el.data ('hold')
+        var vain = $el.data ('vain')
+        
+        if (vain && !withinView ($el)) {
+          $el.data ('_waitingForView', true)
+          log ('on vain: ' + $el[0].id + ' (' + vain + ')') //:dev
+          return false
+        }
+
+        if (vain) {
+          log ('in view: ' + $el[0].id)  //:dev
+        }
         
         if (hold && !$el.data ('_holding')) {
           $el.data ('_holding', true)
-          log ('  hold: ' + $el[0].id + ' (' + hold + ' ms)') //:dev
+          log ('   hold: ' + $el[0].id + ' (' + hold + ' ms)') //:dev
           setTimeout (function () {
             log ('TIME') //:dev
             fire ($el, true)
           }, hold)
           return false
         }
-        
+
         if ($el.data ('_holding') && !shouldGo) {
-          log (' onhold: ' + $el[0].id) //:dev
+          log ('on hold: ' + $el[0].id) //:dev
           return false
         }
-        
+
         var $spinElement = $el.data ('_spinner')
         if ($spinElement) { $spinElement.css ('opacity', 0)}
         
@@ -115,7 +139,9 @@ if (jQuery) {
         
       }
       
-      // checks the queue and emerges the elements that should go
+      // calling arm means:
+      // element $which has all content loaded and can be shown,
+      // but maybe there are other elements which it waits for
       var arm = function ($which) {
         if ($which) {
           log ('ARM:     ' + $which[0].id) //:dev
@@ -180,7 +206,28 @@ if (jQuery) {
         log ('IDLE') //:dev
 
       }
+
+      // does stuff when scrolled
+      var scrolled = function () {
+        for (var i in queue) {
+          var $el = queue[i]
+          if ($el.data ('_waitingForView') && withinView ($el)) {
+            log ('SCROLLED') //:dev
+            $el.data ('_waitingForView', false)
+            fire ($el)
+          }
+        }
+      }
       
+      // starts watching scrolling
+      var watchScrolling = function () {
+        if (!watchingScrolling) {
+          $ (window).on ('scroll', scrolled)
+          watchingScrolling = true
+          log ('now watching scrolling') //:dev
+        }
+      }
+
       $ ('.emerge').each (function () {
     
         var $self = $ (this)
@@ -237,6 +284,13 @@ if (jQuery) {
     
         effect = $self.data ('effect') || false
         duration = $self.data ('duration') || defaultDuration
+
+        vain = $self.data ('vain')
+
+        if (vain) { //:dev
+          // log ('vain element: ' + $self[0].id) //:dev
+          watchScrolling ()
+        } //:dev
 
         if (effect) {
     
@@ -356,8 +410,7 @@ if (jQuery) {
               }
             }
           }
-        
-          
+                  
         })
         
         
