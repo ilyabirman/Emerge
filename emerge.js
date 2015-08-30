@@ -1,4 +1,4 @@
-//! v.1.1.3, http://ilyabirman.net/projects/emerge/
+//! v.1.2, http://ilyabirman.net/projects/emerge/
 
 if (jQuery) {
   
@@ -94,15 +94,15 @@ if (jQuery) {
       var fire = function ($el, shouldGo) {
     
         var hold = $el.data ('hold')
-        var vain = $el.data ('vain')
+        var expose = $el.data ('expose')
         
-        if (vain && !withinView ($el)) {
+        if (expose && !withinView ($el)) {
           $el.data ('_waitingForView', true)
-          log ('on vain: ' + $el[0].id + ' (' + vain + ')') //:dev
+          log ('on expose: ' + $el[0].id + ' (' + expose + ')') //:dev
           return false
         }
 
-        if (vain) {
+        if (expose) {
           log ('in view: ' + $el[0].id)  //:dev
         }
         
@@ -285,10 +285,10 @@ if (jQuery) {
         effect = $self.data ('effect') || false
         duration = $self.data ('duration') || defaultDuration
 
-        vain = $self.data ('vain')
+        expose = $self.data ('expose')
 
-        if (vain) { //:dev
-          // log ('vain element: ' + $self[0].id) //:dev
+        if (expose) { //:dev
+          // log ('expose element: ' + $self[0].id) //:dev
           watchScrolling ()
         } //:dev
 
