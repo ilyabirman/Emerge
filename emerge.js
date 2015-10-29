@@ -1,4 +1,4 @@
-//! v.1.2, http://ilyabirman.net/projects/emerge/
+//! v.1.2.1, http://ilyabirman.net/projects/emerge/
 
 if (jQuery) {
   
@@ -78,12 +78,15 @@ if (jQuery) {
       }                           //:dev
 
       var withinView = function ($el) {
-        // log (' noview: ' + $el[0].id) //:dev
-        // log ('window height = ' + document.body.clientHeight) //:dev
-        // log ('element top = ' + ($el.offset ().top - document.body.scrollTop)) //:dev
+        // log ('________ noview: ' + $el[0].id) //:dev
+        // log ('________ window height = ' + document.body.clientHeight) //:dev
+        // log ('________ window height = ' + document.documentElement.clientHeight) //:dev
+        // log ('________ element top = ' + ($el.offset ().top - document.body.scrollTop)) //:dev
+        bodyHeight = Math.min (
+          document.body.clientHeight, document.documentElement.clientHeight
+        )
         return (
-          ($el.offset ().top - document.body.scrollTop)
-          < document.body.clientHeight
+          ($el.offset ().top - document.body.scrollTop) < bodyHeight
         )
       }
 
