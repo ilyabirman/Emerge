@@ -1,4 +1,4 @@
-//! v.1.2.1, http://ilyabirman.net/projects/emerge/
+//! v.1.2.2, http://ilyabirman.net/projects/emerge/
 
 if (jQuery) {
   
@@ -82,12 +82,12 @@ if (jQuery) {
         // log ('________ window height = ' + document.body.clientHeight) //:dev
         // log ('________ window height = ' + document.documentElement.clientHeight) //:dev
         // log ('________ element top = ' + ($el.offset ().top - document.body.scrollTop)) //:dev
-        bodyHeight = Math.min (
+        var bodyHeight = Math.min (
           document.body.clientHeight, document.documentElement.clientHeight
         )
-        return (
-          ($el.offset ().top - document.body.scrollTop) < bodyHeight
-        )
+        var position = $el.offset ().top;
+        var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        return (position - scrollTop) < bodyHeight
       }
 
       // calling fire means:
