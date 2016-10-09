@@ -1,4 +1,4 @@
-//! v.1.2.2, http://ilyabirman.net/projects/emerge/
+//! v.1.2.3, http://ilyabirman.net/projects/emerge/
 
 if (jQuery) {
   
@@ -225,7 +225,7 @@ if (jQuery) {
       // starts watching scrolling
       var watchScrolling = function () {
         if (!watchingScrolling) {
-          $ (window).on ('scroll', scrolled)
+          $ (window).on ('scroll resize', scrolled)
           watchingScrolling = true
           log ('now watching scrolling') //:dev
         }
