@@ -38,16 +38,16 @@ if (jQuery) {
       var spinnerCode = function (radius, color, backwards, period, fadeDuration) {
         var animationName = 'emergeRotate' + (++ animationNameIndex)
         return (
-          // '<style>' +
-          // '@-webkit-keyframes ' + animationName + ' { ' +
-          // 'from { -webkit-transform: rotate(' + (backwards*360) + 'deg); } ' + 
-          // 'to { -webkit-transform: rotate(' + (!backwards*360) + 'deg); } ' +
-          // ' } ' +
-          // '@keyframes ' + animationName + ' { ' +
-          // 'from { transform: rotate(' + (backwards*360) + 'deg); } ' + 
-          // 'to { transform: rotate(' + (!backwards*360) + 'deg); } ' +
-          // ' } ' +
-          // '</style>' +
+          '<style>' +
+          '@-webkit-keyframes ' + animationName + ' { ' +
+          'from { -webkit-transform: rotate(' + (backwards*360) + 'deg); } ' + 
+          'to { -webkit-transform: rotate(' + (!backwards*360) + 'deg); } ' +
+          ' } ' +
+          '@keyframes ' + animationName + ' { ' +
+          'from { transform: rotate(' + (backwards*360) + 'deg); } ' + 
+          'to { transform: rotate(' + (!backwards*360) + 'deg); } ' +
+          ' } ' +
+          '</style>' +
           '<div style="position: absolute; transition: opacity ' + fadeDuration + 'ms ease-out">' +
           '<div style="position: absolute; left: 50%; top: 50%; margin: -' + radius + 'px">'+
           '<svg xmlns="http://www.w3.org/2000/svg" width="' + (radius*2) + '" height="' + (radius*2) + '"' +
@@ -56,10 +56,10 @@ if (jQuery) {
           'animation: ' + animationName + ' ' + period + 'ms linear infinite' +
           '">' +
           '<path fill="'+ color +'" d="M17.25 1.5c-.14-.06-.28-.11-.44-.11-.55 0-1 .45-1 1 0 .39.23.72.56.89l-.01.01c3.2 1.6 5.39 4.9 5.39 8.71 0 5.38-4.37 9.75-9.75 9.75S2.25 17.39 2.25 12c0-3.82 2.2-7.11 5.39-8.71v-.02c.33-.16.56-.49.56-.89 0-.55-.45-1-1-1-.16 0-.31.05-.44.11C2.9 3.43.25 7.4.25 12c0 6.49 5.26 11.75 11.75 11.75S23.75 18.49 23.75 12c0-4.6-2.65-8.57-6.5-10.5z">' +
-            '<animateTransform attributeName="transform" type="rotate" ' +
-            'from="' + (backwards*360) + ' 12 12" to="' + (!backwards*360) + ' 12 12" ' +
-            'dur="' + period + 'ms" repeatCount="indefinite"' + 
-            ' />' + 
+            // '<animateTransform attributeName="transform" type="rotate" ' +
+            // 'from="' + (backwards*360) + ' 12 12" to="' + (!backwards*360) + ' 12 12" ' +
+            // 'dur="' + period + 'ms" repeatCount="indefinite"' + 
+            // ' />' + 
           '</path>' + 
           '</svg>' + 
           '</div>' + 
