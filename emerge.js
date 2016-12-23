@@ -229,6 +229,7 @@ if (jQuery) {
       
           var $self = $ (this)
           var innerImagesSrcs = {}
+          var innerItems = []
           var spin = false
           var spinnerRadius = 12
           var spinnerPeriod = 1333
@@ -388,29 +389,55 @@ if (jQuery) {
           // iterate through inner objects to find images
           
           $self.find ('*').addBack ().each (function () {
-            var element = $ (this);
+            var $element = $ (this);
       
             // img elements
-            if (element.is('img')) if (element.attr ('src')) {
-              if (!cached (element.attr ('src'))) {
-                innerImagesSrcs[element.attr ('src')] = true
+            if ($element.is('img')) if ($element.attr ('src')) {
+              if (!cached ($element.attr ('src'))) {
+                innerImagesSrcs[$element.attr ('src')] = true
               }
             }
             
             // css properties with images
             for (var i=0; i<cssImageProps.length; ++i) {
               var key = cssImageProps[i]
-              var value = element.css (key)
+              var value = $element.css (key)
               var pos = -1
               var match
               if (value && ((pos = value.indexOf ('url(')) >= 0)) {
                 while ((match = cssUrlRegex.exec (value)) !== null) {
-                  if (!cached (element.attr ('src'))) {
+                  if (!cached ($element.attr ('src'))) {
                     innerImagesSrcs[match[2]] = true
                   }
                 }
               }
             }
+
+            // video
+            if ($element.is ('video')) {
+              var event = $element.data ('emergeable') || 'canplaythrough'
+              innerItems.push ({
+                'item': $element,
+                'event': event
+              })
+            }
+
+            // if ($element.is('.emerge-item')) {
+            //   log ('emerge item to load: ' + $element[0]) //:dev
+            //   var event = $element.data ('event')
+            //   if (event == '') event = 'canplaythrough'
+            //   if (event = $element.data ('event')) {
+            //     log ('emerge item load event: ' + event) //:dev
+            //     innerItems.push ({
+            //       'item': $element,
+            //       'event': event
+            //     })
+            //     // elementsCount ++
+            //     // $element.on (event, element)
+            //   } else { //:dev
+            //     log ('no event') //:dev
+            //   }
+            // }
                     
           })
           
@@ -474,8 +501,22 @@ if (jQuery) {
             }
           }
       
+          // wait for other objects (videos for now)
+          for (var i in innerItems) {
+            log ('item to load: ' + innerItems[i]) //:dev
+            elementsCount ++
+            var $element = innerItems[i]['item']
+            var event = innerItems[i]['event']
+            log ('readyState: ' + $element[0].readyState) //:dev
+            if ($element[0].readyState >= 4) {
+              // this is for video only
+              element ()
+            } else {
+              $element.on (event, element)
+            }
+          }
           
-          // if there were no images, this will help
+          // if there were no images or other objects, this will help
           elementsCount ++
           element ()
           
