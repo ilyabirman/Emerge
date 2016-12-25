@@ -45,7 +45,7 @@ if (jQuery) {
           'transform-origin: 50 50; ' +
           'animation: ' + animationName + ' ' + period + 'ms linear infinite' +
           '" /></mask></defs>'+
-          '<circle r="50" cx="50" cy="50" mask="url(#cut)" />'+
+          '<circle r="50" cx="50" cy="50" mask="url(#cut)" fill="' + color + '" />'+
           '</svg>' + 
           '</div>' + 
           '</div>'
@@ -104,7 +104,12 @@ if (jQuery) {
         }
 
         var $spinElement = $el.data ('_spinner')
-        if ($spinElement) { $spinElement.css ('opacity', 0)}
+        if ($spinElement) {
+          $spinElement.css ('opacity', 0)
+          setTimeout (function () {
+            $spinElement.remove ()
+          }, defaultDuration)
+        }
         
         $el.css ('transition', 'opacity ' + defaultDuration + 'ms ease-out')
         $el.css ('opacity', '1')
@@ -415,7 +420,7 @@ if (jQuery) {
 
             // video
             if ($element.is ('video')) {
-              var event = $element.data ('emergeable') || 'canplaythrough'
+              var event = $element.data ('emerge-event') || 'canplaythrough'
               innerItems.push ({
                 'item': $element,
                 'event': event
@@ -444,48 +449,52 @@ if (jQuery) {
           
           // start spinner, if necessary and possible
           
-          if (Object.keys (innerImagesSrcs).length > 0) if (spin = $self.data ('spin')) {
+          // if (1 || (Object.keys (innerImagesSrcs).length > 0)) {
+            if (spin = $self.data ('spin')) {
 
-              var customSpinnerID = $self.data ('spin-element')
+                var customSpinnerID = $self.data ('spin-element')
 
-              if (customSpinnerID) {
+                if (customSpinnerID) {
 
-                // use custom spinner
+                  // use custom spinner
 
-                var $spinElement = $ ('#' + customSpinnerID).clone ().css ({
-                  'position': 'absolute',
-                  'display': 'block'
+                  var $spinElement = $ ('#' + customSpinnerID).clone ().css ({
+                    'position': 'absolute',
+                    'display': 'block'
+                  })
+
+
+                } else {
+
+                  // use built-in spinner
+
+                  if ($self.data ('spin-size')) spinnerRadius = $self.data ('spin-size') / 2
+                  if ($self.data ('spin-color')) spinnerColor = $self.data ('spin-color')
+                  if ($self.data ('spin-period')) spinnerPeriod = $self.data ('spin-period')
+                  if ($self.data ('spin-direction')) spinnerBackwards = (
+                    ($self.data ('spin-direction') == 'clockwise') ? 0:1
+                  )
+
+                  spinnerFadeDuration = duration
+
+                  var $spinElement = $ (
+                    spinnerCode (spinnerRadius, spinnerColor, spinnerBackwards, spinnerPeriod, spinnerFadeDuration)
+                  )
+
+                }
+
+                $spinElement.css ({
+                  'width': '100%',//$self.width (),
+                  'height': Math.min ($self.height (), document.body.clientHeight - $self.offset ().top)
                 })
 
+                $spinElement.addClass ('emerge-spin-element')
 
-              } else {
-
-                // use built-in spinner
-
-                if ($self.data ('spin-size')) spinnerRadius = $self.data ('spin-size') / 2
-                if ($self.data ('spin-color')) spinnerColor = $self.data ('spin-color')
-                if ($self.data ('spin-period')) spinnerPeriod = $self.data ('spin-period')
-                if ($self.data ('spin-direction')) spinnerBackwards = (
-                  ($self.data ('spin-direction') == 'clockwise') ? 0:1
-                )
-
-                spinnerFadeDuration = duration
-
-                var $spinElement = $ (
-                  spinnerCode (spinnerRadius, spinnerColor, spinnerBackwards, spinnerPeriod, spinnerFadeDuration)
-                )
-
-              }
-
-              $spinElement.css ({
-                'width': '100%',//$self.width (),
-                'height': Math.min ($self.height (), document.body.clientHeight - $self.offset ().top)
-              })
-
-              $self.before ($spinElement)
-              $self.data ('_spinner', $spinElement)
-          
-          }
+                $self.before ($spinElement)
+                $self.data ('_spinner', $spinElement)
+            
+            }
+          // }
           
           
           // wait for all inner images
@@ -544,6 +553,7 @@ if (jQuery) {
           // actually, it works even without it
           $ ('.emerge').css ('transition', 'none')
           $ ('.emerge').css ('opacity', '0')
+          $ ('.emerge-spin-element').remove ()
 
           play ()
           return false
