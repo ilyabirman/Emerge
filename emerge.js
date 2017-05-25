@@ -1,4 +1,4 @@
-//! v.1.31, http://ilyabirman.net/projects/emerge/
+//! v.1.3.1, http://ilyabirman.net/projects/emerge/
 
 if (jQuery) {
   
@@ -411,7 +411,7 @@ if (jQuery) {
               var match
               if (value && ((pos = value.indexOf ('url(')) >= 0)) {
                 while ((match = cssUrlRegex.exec (value)) !== null) {
-                  if (!cached ($element.attr ('src'))) {
+                  if (!cached (match[2])) {
                     innerImagesSrcs[match[2]] = true
                   }
                 }
