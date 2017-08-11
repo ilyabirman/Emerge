@@ -33,19 +33,19 @@ if (jQuery) {
           '@keyframes ' + animationName + ' { ' +
           'from { transform: rotate(' + (backwards*360) + 'deg) } ' + 
           'to { transform: rotate(' + (!backwards*360) + 'deg) } ' +
-          ' } ' +
+          ' }' +
           '</style>' +
           '<div style="position: absolute; transition: opacity ' + fadeDuration + 'ms ease-out">' +
           '<div style="position: absolute; left: 50%; top: 50%; margin: -' + radius + 'px">'+
           '<svg width="' + (radius*2) + '" height="' + (radius*2) + '"' +
           'viewBox="0 0 100 100">' +
-          '<defs><mask id="cut"><rect width="100" height="100" fill="white" />' +
-          '<circle r="40" cx="50" cy="50" fill="black" />' +
-          '<polygon points="50,50 100,25 150,50 100,75" fill="black" style="' +
+          '<defs><mask id="cut"><rect width="100" height="100" fill="white" stroke="none" />' +
+          '<circle r="40" cx="50" cy="50" fill="black" stroke="none" />' +
+          '<polygon points="50,50 100,25 150,50 100,75" fill="black" stroke="none" style="' +
           'transform-origin: left center; ' +
           'animation: ' + animationName + ' ' + period + 'ms linear infinite' +
           '" /></mask></defs>'+
-          '<circle r="50" cx="50" cy="50" mask="url(#cut)" fill="' + color + '" />'+
+          '<circle r="50" cx="50" cy="50" mask="url(#cut)" fill="' + color + '" stroke="none" />'+
           '</svg>' + 
           '</div>' + 
           '</div>'
