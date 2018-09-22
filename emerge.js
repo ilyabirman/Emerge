@@ -1,4 +1,4 @@
-//! v.1.3.1, http://ilyabirman.net/projects/emerge/
+//! v.1.3.2, http://ilyabirman.net/projects/emerge/
 
 if (jQuery) {
   
@@ -42,7 +42,7 @@ if (jQuery) {
           '<defs><mask id="cut"><rect width="100" height="100" fill="white" stroke="none" />' +
           '<circle r="40" cx="50" cy="50" fill="black" stroke="none" />' +
           '<polygon points="50,50 100,25 150,50 100,75" fill="black" stroke="none" style="' +
-          'transform-origin: left center; ' +
+          'transform-origin: center center; ' +
           'animation: ' + animationName + ' ' + period + 'ms linear infinite' +
           '" /></mask></defs>'+
           '<circle r="50" cx="50" cy="50" mask="url(#cut)" fill="' + color + '" stroke="none" />'+
