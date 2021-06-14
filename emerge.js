@@ -288,7 +288,7 @@ if (jQuery) {
           effect = $self.data ('effect') || false
           duration = $self.data ('duration') || defaultDuration
 
-          expose = $self.data ('expose')
+          var expose = $self.data ('expose')
 
           if (expose) { //:dev
             // log ('expose element: ' + $self[0].id) //:dev
