@@ -584,5 +584,7 @@
     play ()
   })
 
-  document.write ('<style>.emerge { opacity: 0; }</style>')
+  const style = document.createElement('style')
+  style.innerHTML = '.emerge { opacity: 0; }'
+  document.head.append(style)
 }());
