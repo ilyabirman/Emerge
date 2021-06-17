@@ -1,6 +1,6 @@
 //! v.1.3.2, http://ilyabirman.net/projects/emerge/
 ;(function () {
-  function ready(callback) {
+  var ready = function (callback) {
     if (document.readyState !== 'loading') {
       callback();
     } else {
@@ -16,12 +16,15 @@
     }
   }
 
-  ready(function () {
+  ready (function () {
 
     var queue;
     var elementsFired;
     var elementsOnHold;
     var watchingScrolling;
+
+    var waitingForView = new WeakMap ()
+    var waitFor = new WeakMap ()
 
     var defaultDuration = 500
     var cssImageProps = [
@@ -71,7 +74,7 @@
       if (1) console.log (txt)  //:dev
     }                           //:dev
 
-    var withinView = function ($el) {
+    var withinView = function (el) {
       // log ('________ noview: ' + $el[0].id) //:dev
       // log ('________ window height = ' + document.body.clientHeight) //:dev
       // log ('________ window height = ' + document.documentElement.clientHeight) //:dev
@@ -79,7 +82,7 @@
       var bodyHeight = Math.min (
         document.body.clientHeight, document.documentElement.clientHeight
       )
-      var position = $el.offset ().top; //$ element.getBoundingClientRect().top
+      var position = el.getBoundingClientRect().top;
       var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       return (position - scrollTop) < bodyHeight
     }
@@ -88,36 +91,36 @@
     // element $el is has all content loaded and can be shown,
     // also there is no other element that prevents it from being shown,
     // so check if it has its own limitations like hold timeout or scrolling
-    var fire = function ($el, shouldGo) {
+    var fire = function (el, shouldGo) {
 
-      var hold = $el.get(0).dataset.hold //$
-      var expose = $el.get(0).dataset.expose //$
+      var hold = el.dataset.hold
+      var expose = el.dataset.expose
 
-      if (expose && !withinView ($el)) {
-        $el.data ('_waitingForView', true) //$
-        log ('on expose: ' + $el[0].id + ' (' + expose + ')') //:dev
+      if (expose && !withinView (el)) {
+        waitingForView.set (el, true)
+        log ('on expose: ' + el.id + ' (' + expose + ')') //:dev
         return false
       }
 
       if (expose) {
-        log ('in view: ' + $el[0].id)  //:dev
+        log ('in view: ' + el.id)  //:dev
       }
 
-      if (hold && !elementsOnHold.includes($el)) { //$
-        elementsOnHold.push ($el)
-        log ('   hold: ' + $el[0].id + ' (' + hold + ' ms)') //:dev
+      if (hold && !elementsOnHold.includes(el)) {
+        elementsOnHold.push (el)
+        log ('   hold: ' + el.id + ' (' + hold + ' ms)') //:dev
         setTimeout (function () {
           log ('TIME') //:dev
-          fire ($el, true)
+          fire (el, true)
         }, hold)
         return false
       }
-      if (elementsOnHold.includes($el) && !shouldGo) { //$
-        log ('on hold: ' + $el[0].id) //:dev
+      if (elementsOnHold.includes(el) && !shouldGo) {
+        log ('on hold: ' + el.id) //:dev
         return false
       }
 
-      var $spinElement = $el.data ('_spinner') //$
+      var $spinElement = $(el).data ('_spinner') //$
       if ($spinElement) {
         $spinElement.get(0).style.opacity = 0 //$
         setTimeout (function () {
@@ -125,16 +128,16 @@
         }, defaultDuration)
       }
 
-      $el.css ('transition', 'opacity ' + defaultDuration + 'ms ease-out') //$
-      $el.css ('opacity', '1') //$
+      el.style.transition = `opacity ${defaultDuration}ms ease-out`
+      el.style.opacity = 1
 
-      var style2 = $el.get(0).dataset['style-2'] //$
+      var style2 = el.dataset['style-2']
       if (style2) {
-        $el.get(0).setAttribute('style', $el.get(0).getAttribute('style') + '; '  + style2) //$
+        el.setAttribute('style', el.getAttribute('style') + '; '  + style2)
       }
 
-      log ('  FIRED! ' + $el[0].id) //:dev
-      elementsFired.push ($el)
+      log ('  FIRED! ' + el.id) //:dev
+      elementsFired.push (el)
 
       arm ()
 
@@ -143,10 +146,10 @@
     // calling arm means:
     // element $which has all content loaded and can be shown,
     // but maybe there are other elements which it waits for
-    var arm = function ($which) {
-      if ($which) {
-        log ('ARM:     ' + $which[0].id) //:dev
-        queue.push ($which)
+    var arm = function (which) {
+      if (which) {
+        log ('ARM:     ' + which.id) //:dev
+        queue.push (which)
       } else { //:dev
         log ('ARM') //:dev
       }
@@ -159,37 +162,36 @@
       log ('  queue: ' + queueStr) //:dev
       */
 
-      for (var i in queue) {
-        var $el = queue[i]
+      // for (var i in queue) {
+      queue.forEach(function (el) {
 
-        if (elementsFired.includes($el)) { //$
+        if (elementsFired.includes(el)) {
 
-          log ('  fired earlier: ' + $el[0].id)  //:dev
+          log ('  fired earlier: ' + el.id)  //:dev
           // log (elementsFired)  //:dev
 
         } else {
 
-          var $test_el
+          var test_el
           var deadlock = false
 
-          if ($test_el = $el.data ('_waitFor')) { //$
-
-            if (!elementsOnHold.includes($el)) {      //:dev //$
-              log ('  waits: ' + $el[0].id)                    //:dev
+          if (test_el = waitFor.get (el)) {
+            if (!elementsOnHold.includes(el)) {      //:dev
+              log ('  waits: ' + el.id)                    //:dev
             }                                                  //:dev
 
             // check for a deadlock
-            while (1) {
-              if (!elementsFired.includes($test_el)) { //$
+            while (true) {
+              if (!elementsFired.includes(test_el)) {
 
-                log ('     for ' + $test_el[0].id) //:dev
+                log ('     for ' + test_el.id) //:dev
 
-                if ($test_el[0] == $el[0]) {
+                if (test_el == el) {
                   log ('  FUCK, WE HAVE A DEADLOCK!') //:dev
                   deadlock = true
                   break
                 }
-                if ($test_el = $test_el.data ('_waitFor')) { //$
+                if (test_el = waitFor.get (test_el)) {
                   continue
                 }
               }
@@ -197,18 +199,18 @@
             }
 
             if (
-              (elementsFired.includes($el.data('_waitFor'))) //$
+              (elementsFired.includes(waitFor.get (el)))
               || deadlock
             ) {
-              fire ($el)
+              fire (el)
             }
 
           } else {
-            fire ($el)
+            fire (el)
           }
         }
 
-      }
+      })
 
       log ('IDLE') //:dev
 
@@ -216,14 +218,13 @@
 
     // does stuff when scrolled
     var scrolled = function () {
-      for (var i in queue) {
-        var $el = queue[i]
-        if ($el.data ('_waitingForView') && withinView ($el)) { //$
+      queue.forEach (function (el) {
+        if (waitingForView.has (el) && withinView (el)) {
           log ('SCROLLED') //:dev
-          $el.data ('_waitingForView', false) //$
-          fire ($el)
+          waitingForView.delete (el)
+          fire (el)
         }
-      }
+      })
     }
 
     // starts watching scrolling
@@ -242,11 +243,11 @@
       elementsOnHold = []
       watchingScrolling = false
 
-      var $prev = false
+      var prevs = new WeakMap ()
+      var prev;
 
-      $ ('.emerge').each (function () { //$
+      document.querySelectorAll ('.emerge').forEach(function (self) {
 
-        var $self = $ (this) //$
         var innerImagesSrcs = {}
         var innerItems = []
         var spin = false
@@ -262,23 +263,23 @@
         var duration = defaultDuration
         var effect = {}
 
-        $self.$prev = $prev
+        prevs.set (self, prev)
 
         var enqueue = function () {
 
-          if ($self.get(0).dataset.continue) { //$
-            $self.data ('_waitFor', $self.$prev) //$
+          if (self.dataset.continue) {
+            waitFor.set (self, prevs.get(self))
           }
 
-          if ($self.get(0).dataset.await) { //$
-            $self.data ('_waitFor', $ ('#' + $self.get(0).dataset.await)) //$
+          if (self.dataset.await) {
+            waitFor.set (self, document.getElementById (self.dataset.await))
           }
 
-          if ($self.data ('_waitFor')) { //:dev //$
-            log ('         ' + $self[0].id + ' will wait for ' + $self.data ('_waitFor')[0].id) //:dev
+          if (waitFor.has (self)) { //:dev
+            log ('         ' + self.id + ' will wait for ' + waitFor.get (self).id) //:dev
           } //:dev
 
-          arm ($self)
+          arm (self)
 
         }
 
@@ -287,24 +288,24 @@
           elementsLoaded ++
 
           if (elementsLoaded == elementsCount) {
-            setTimeout (enqueue, $self.get(0).dataset.slow) //$
+            setTimeout (enqueue, self.dataset.slow)
           }
 
         }
 
-        if ($self.get(0).dataset.opaque) { //$
-          $self.get(0).style.opacity = 1 //$
+        if (self.dataset.opaque) {
+          self.style.opacity = 1
         }
 
         // if an effect is set, use it
 
-        effect = $self.get(0).dataset.effect || false //$
-        duration = $self.get(0).dataset.duration || defaultDuration //$
+        effect = self.dataset.effect || false
+        duration = self.dataset.duration || defaultDuration
 
-        var expose = $self.get(0).dataset.expose //$
+        var expose = self.dataset.expose
 
         if (expose) { //:dev
-          // log ('expose element: ' + $self[0].id) //:dev
+          // log ('expose element: ' + self.id) //:dev
           watchScrolling ()
         } //:dev
 
@@ -316,13 +317,13 @@
           var cssPrefixes = ['', '-webkit-']
           var cssTransform = 'transform'
           var cssTransformOrigin = 'transform-origin'
-          var up = $self.get(0).dataset.up || 0 //$
-          var down = $self.get(0).dataset.down || 0 //$
-          var left = $self.get(0).dataset.left || 0 //$
-          var right = $self.get(0).dataset.right || 0 //$
-          var angle = $self.get(0).dataset.angle || '90' //$
-          var scale = $self.get(0).dataset.scale || -1 //$
-          var origin = $self.get(0).dataset.origin || '50% 50%' //$
+          var up = self.dataset.up || 0
+          var down = self.dataset.down || 0
+          var left = self.dataset.left || 0
+          var right = self.dataset.right || 0
+          var angle = self.dataset.angle || '90'
+          var scale = self.dataset.scale || -1
+          var origin = self.dataset.origin || '50% 50%'
 
           if (down) {
             up = '-' + down
@@ -376,36 +377,37 @@
           }
 
           if (fxData) {
-            for (var i=0; i<cssPrefixes.length; ++i) {
+
+            cssPrefixes.forEach(function (prefix) {
               style1 += (
-                cssPrefixes[i] + cssTransform + ': ' + fxData.one + '; ' +
-                cssPrefixes[i] + cssTransformOrigin + ': ' + fxData.orn +  '; '
+                prefix + cssTransform + ': ' + fxData.one + '; ' +
+                prefix + cssTransformOrigin + ': ' + fxData.orn +  '; '
               )
               style2 += (
-                cssPrefixes[i] + cssTransform + ': ' + fxData.two + '; ' +
-                cssPrefixes[i] + 'transition: ' +
+                prefix + cssTransform + ': ' + fxData.two + '; ' +
+                prefix + 'transition: ' +
                 'opacity ' + duration + 'ms ease-out, ' +
-                cssPrefixes[i] + cssTransform + ' ' + duration + 'ms ' + fxData.crv + '; '
+                prefix + cssTransform + ' ' + duration + 'ms ' + fxData.crv + '; '
               )
-            }
+            })
           }
 
-          $self.get(0).dataset['style-1'] = style1 //$
-          $self.get(0).dataset['style-2'] = style2 //$
+          self.dataset['style-1'] = style1
+          self.dataset['style-2'] = style2
 
         }
 
         // if initial style set, use it
 
-        if (!style1) style1 = $self.get(0).dataset['style-1'] //$
+        if (!style1) style1 = self.dataset['style-1']
         if (style1) {
-          $self.get(0).setAttribute('style', $self.get(0).getAttribute('style') + '; ' + style1) //$
+          self.setAttribute('style', self.getAttribute('style') + '; ' + style1)
         }
 
 
         // iterate through inner objects to find images
 
-        $self.find ('*').addBack ().each (function () { //$
+        $(self).find ('*').addBack ().each (function () { //$
           var $element = $ (this); //$
 
           // img elements
@@ -462,9 +464,9 @@
         // start spinner, if necessary and possible
 
         // if (1 || (Object.keys (innerImagesSrcs).length > 0)) {
-        if (spin = $self.get(0).dataset.spin) { //$
+        if (spin = self.dataset.spin) {
 
-          var customSpinnerID = $self.get(0).dataset.spinElement //$
+          var customSpinnerID = self.dataset.spinElement
 
           if (customSpinnerID) {
 
@@ -477,105 +479,110 @@
 
           } else {
 
-          // use built-in spinner
+            // use built-in spinner
 
-          if ($self.get(0).dataset['spin-size']) { //$
-            spinnerRadius = $self.get(0).dataset['spin-size'] / 2 //$
-          }
-          if ($self.get(0).dataset['spin-color']) { //$
-            spinnerColor = $self.get(0).dataset['spin-color'] //$
-          }
-          if ($self.get(0).dataset['spin-period']) { //$
-            spinnerPeriod = $self.get(0).dataset['spin-period'] //$
-          }
-          if ($self.get(0).dataset['spin-direction']) { //$
-            spinnerBackwards = ( //$
-              $self.get(0).dataset['spin-direction'] === 'clockwise' //$
-              ? 0
-              : 1
+            if (self.dataset['spin-size']) {
+              spinnerRadius = self.dataset['spin-size'] / 2
+            }
+            if (self.dataset['spin-color']) {
+              spinnerColor = self.dataset['spin-color']
+            }
+            if (self.dataset['spin-period']) {
+              spinnerPeriod = self.dataset['spin-period']
+            }
+            if (self.dataset['spin-direction']) {
+              spinnerBackwards = (
+                self.dataset['spin-direction'] === 'clockwise'
+                ? 0
+                : 1
+              )
+            }
+
+            spinnerFadeDuration = duration
+
+            var $spinElement = $ ( //$
+              spinnerCode (spinnerRadius, spinnerColor, spinnerBackwards, spinnerPeriod, spinnerFadeDuration)
             )
+
           }
 
-          spinnerFadeDuration = duration
+          $spinElement.css ({ //$
+            'width': '100%',//$(self).width (),
+            'height': Math.min ($(self).height (), document.body.clientHeight - $(self).offset ().top) //$
+          })
 
-          var $spinElement = $ ( //$
-            spinnerCode (spinnerRadius, spinnerColor, spinnerBackwards, spinnerPeriod, spinnerFadeDuration)
-          )
+          $spinElement.get(0).classList.add ('emerge-spin-element')
+
+          $(self).before ($spinElement) //$
+          $(self).data ('_spinner', $spinElement) //$
 
         }
-
-        $spinElement.css ({ //$
-          'width': '100%',//$self.width (),
-          'height': Math.min ($self.height (), document.body.clientHeight - $self.offset ().top) //$
-        })
-
-        $spinElement.get(0).classList.add ('emerge-spin-element') //$
-
-        $self.before ($spinElement) //$
-        $self.data ('_spinner', $spinElement) //$
-
-      }
-    // }
+      // }
 
 
-      // wait for all inner images
-      for (var i in innerImagesSrcs) {
-        log ('image to load: ' + i) //:dev
-        var imageToWaitFor = new Image ()
-        imageToWaitFor.src = i
+        // wait for all inner images
+        for (var i in innerImagesSrcs) {
+          log ('image to load: ' + i) //:dev
+          var imageToWaitFor = new Image ()
+          imageToWaitFor.src = i
+          elementsCount ++
+          if (imageToWaitFor.width > 0) {
+            element ()
+          } else {
+            $ (imageToWaitFor).on ('load error', element) //$
+          }
+        }
+
+        // wait for other objects (videos for now)
+        for (var i in innerItems) {
+          log ('item to load: ' + innerItems[i]) //:dev
+          elementsCount ++
+          var $element = innerItems[i]['item']
+          var event = innerItems[i]['event']
+          log ('readyState: ' + $element[0].readyState) //:dev
+          if ($element[0].readyState >= 4) {
+            // this is for video only
+            element ()
+          } else {
+            $element.on (event, element) //$
+          }
+        }
+
+        // if there were no images or other objects, this will help
         elementsCount ++
-        if (imageToWaitFor.width > 0) {
-          element ()
-        } else {
-          $ (imageToWaitFor).on ('load error', element) //$
-        }
-      }
-
-      // wait for other objects (videos for now)
-      for (var i in innerItems) {
-        log ('item to load: ' + innerItems[i]) //:dev
-        elementsCount ++
-        var $element = innerItems[i]['item']
-        var event = innerItems[i]['event']
-        log ('readyState: ' + $element[0].readyState) //:dev
-        if ($element[0].readyState >= 4) {
-          // this is for video only
-          element ()
-        } else {
-          $element.on (event, element) //$
-        }
-      }
-
-      // if there were no images or other objects, this will help
-      elementsCount ++
-      element ()
+        element ()
 
 
-      $prev = $self
-    })
+        prev = self
+      })
 
-  }
+    }
 
-  if (window.navigator && (window.navigator.loadPurpose === 'preview')) {
-    $ ('.emerge').css ('transition', 'none')
-    $ ('.emerge').css ('opacity', '1')
-    return false
-  }
-
-  $ ('.emerge-replay').each (function () { //$
-
-    var $self = $ (this) //$
-    $self.click (function () { //$
-
-      log ('REPLAY') //:dev
-      // clearAllTimeouts ()?
-      // actually, it works even without it
-      $ ('.emerge').css ('transition', 'none')
-      $ ('.emerge').css ('opacity', '0')
-      $ ('.emerge-spin-element').remove ()
-
-      play ()
+    if (window.navigator && (window.navigator.loadPurpose === 'preview')) {
+      document.querySelectorAll ('.emerge').forEach (function (element) {
+        element.style.transition = 'none'
+        element.style.opacity = 1
+      })
       return false
+    }
+
+    document.querySelectorAll ('.emerge-replay').forEach (function (element) {
+
+      element.addEventListener ('click', function () {
+
+        log ('REPLAY') //:dev
+        // clearAllTimeouts ()?
+        // actually, it works even without it
+        document.querySelectorAll ('.emerge').forEach (function (element) {
+          element.style.transition = 'none'
+          element.style.opacity = 0
+        })
+        document.querySelectorAll ('.emerge').forEach (function (element) {
+          element.remove ()
+        });
+
+        play ()
+        return false
 
       })
 
