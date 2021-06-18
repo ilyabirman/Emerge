@@ -48,13 +48,13 @@
     var spinnerCode = function (radius, color, backwards, period, fadeDuration) {
       var animationName = 'emergeRotate' + (++ animationNameIndex)
       return (
+        '<div style="position: absolute; transition: opacity ' + fadeDuration + 'ms ease-out">' +
         '<style>' +
         '@keyframes ' + animationName + ' { ' +
         'from { transform: rotate(' + (backwards*360) + 'deg) } ' +
         'to { transform: rotate(' + (!backwards*360) + 'deg) } ' +
         ' }' +
         '</style>' +
-        '<div style="position: absolute; transition: opacity ' + fadeDuration + 'ms ease-out">' +
         '<div style="position: absolute; left: 50%; top: 50%; margin: -' + radius + 'px">'+
         '<svg width="' + (radius*2) + '" height="' + (radius*2) + '"' +
         'viewBox="0 0 100 100">' +
@@ -178,8 +178,8 @@
 
           if (test_el = waitFor.get (el)) {
             if (!elementsOnHold.includes(el)) {      //:dev
-              log ('  waits: ' + el.id)                    //:dev
-            }                                                  //:dev
+              log ('  waits: ' + el.id)              //:dev
+            }                                        //:dev
 
             // check for a deadlock
             while (true) {
@@ -410,7 +410,7 @@
 
         $(self).find ('*').addBack ().each (function () { //$
           var $element = $ (this); //$
-          var $spinElement; //$
+          var spinElement; //$
 
           // img elements
           if ($element.is('img')) if ($element.attr ('src')) { //$
@@ -474,9 +474,9 @@
 
             // use custom spinner
 
-            $spinElement = $ (customSpinner.cloneNode (true))
-            $spinElement.get(0).style.position = 'absolute'
-            $spinElement.get(0).style.display = 'block'
+            spinElement = customSpinner.cloneNode (true)
+            spinElement.style.position = 'absolute'
+            spinElement.style.display = 'block'
 
           } else {
 
@@ -501,21 +501,21 @@
 
             spinnerFadeDuration = duration
 
-            $spinElement = $ ( //$
+            spinElement = $ ( //$
               spinnerCode (spinnerRadius, spinnerColor, spinnerBackwards, spinnerPeriod, spinnerFadeDuration)
-            )
+            ).get(0)
 
           }
 
-          $spinElement.css ({ //$
+          $(spinElement).css ({ //$
             'width': '100%',//$(self).width (),
             'height': Math.min ($(self).height (), document.body.clientHeight - $(self).offset ().top) //$
           })
 
-          $spinElement.get(0).classList.add ('emerge-spin-element')
+          spinElement.classList.add ('emerge-spin-element')
 
-          $(self).before ($spinElement) //$
-          spinner.set (self, $spinElement.get(0))
+          $(self).before (spinElement) //$
+          spinner.set (self, spinElement)
 
         }
       // }
