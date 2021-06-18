@@ -249,7 +249,7 @@
 
       document.querySelectorAll ('.emerge').forEach(function (self) {
 
-        var innerImagesSrcs = {}
+        var innerImagesSrcs = {} // should be an object to keep unique sources
         var innerItems = []
         var spin = false
         var spinnerRadius = 12
@@ -408,21 +408,19 @@
 
         // iterate through inner objects to find images
 
-        $(self).find ('*').addBack ().each (function () { //$
-          var $element = $ (this); //$
-          var spinElement; //$
+        ;[self].concat (Array.from (self.querySelectorAll ('*'))).forEach (function (element) {
+          var spinElement;
 
           // img elements
-          if ($element.is('img')) if ($element.attr ('src')) { //$
-            if (!cached ($element.attr ('src'))) { //$
-              innerImagesSrcs[$element.attr ('src')] = true //$
+          if (element.nodeName.toLowerCase () === 'img') if (element.getAttribute ('src')) {
+            if (!cached (element.getAttribute ('src'))) {
+              innerImagesSrcs[element.getAttribute ('src')] = true
             }
           }
 
           // css properties with images
-          for (var i=0; i<cssImageProps.length; ++i) {
-            var key = cssImageProps[i]
-            var value = $element.css (key)
+          cssImageProps.forEach (function (key) {
+            var value = $(element).css (key) //$
             var pos = -1
             var match
             if (value && ((pos = value.indexOf ('url(')) >= 0)) {
@@ -432,14 +430,14 @@
                 }
               }
             }
-          }
+          })
 
           // video
-          if ($element.is ('video')) { //$
-            var event = $element.get(0).dataset['emerge-event'] || 'canplaythrough' //$
+          if (element.nodeName.toLowerCase () === 'video') {
+            var event = element.dataset['emerge-event'] || 'canplaythrough'
             innerItems.push ({
-              'item': $element,
-              'event': event
+              item: element,
+              event: event
             })
           }
 
@@ -514,7 +512,7 @@
 
           spinElement.classList.add ('emerge-spin-element')
 
-          $(self).before (spinElement) //$
+          self.parentNode.insertBefore (spinElement, self)
           spinner.set (self, spinElement)
 
         }
@@ -522,37 +520,34 @@
 
 
         // wait for all inner images
-        for (var i in innerImagesSrcs) {
-          log ('image to load: ' + i) //:dev
+        Object.keys(innerImagesSrcs).forEach (function (src) {
+          log ('image to load: ' + src) //:dev
           var imageToWaitFor = new Image ()
-          imageToWaitFor.src = i
+          imageToWaitFor.src = src
           elementsCount ++
           if (imageToWaitFor.width > 0) {
             element ()
           } else {
             $ (imageToWaitFor).on ('load error', element) //$
           }
-        }
+        })
 
         // wait for other objects (videos for now)
-        for (var i in innerItems) {
-          log ('item to load: ' + innerItems[i]) //:dev
+        innerItems.forEach (function (inner) {
+          log ('item to load: ' + inner)
           elementsCount ++
-          var $element = innerItems[i]['item'] //$
-          var event = innerItems[i]['event']
-          log ('readyState: ' + $element[0].readyState) //:dev
-          if ($element[0].readyState >= 4) { //$
+          log ('readyState: ' + inner.item.readyState)
+          if (inner.item.readyState >= 4) {
             // this is for video only
             element ()
           } else {
-            $element.on (event, element) //$
+            $ (inner.item).on (inner.event, element) //$
           }
-        }
+        })
 
         // if there were no images or other objects, this will help
         elementsCount ++
         element ()
-
 
         prev = self
       })
