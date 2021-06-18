@@ -25,6 +25,7 @@
 
     var waitingForView = new WeakMap ()
     var waitFor = new WeakMap ()
+    var spinner = new WeakMap ()
 
     var defaultDuration = 500
     var cssImageProps = [
@@ -120,11 +121,11 @@
         return false
       }
 
-      var $spinElement = $(el).data ('_spinner') //$
-      if ($spinElement) {
-        $spinElement.get(0).style.opacity = 0 //$
+      var spinElement = spinner.get (el)
+      if (spinElement) {
+        spinElement.style.opacity = 0
         setTimeout (function () {
-          $spinElement.remove () //$
+          spinElement.remove ()
         }, defaultDuration)
       }
 
@@ -409,6 +410,7 @@
 
         $(self).find ('*').addBack ().each (function () { //$
           var $element = $ (this); //$
+          var $spinElement; //$
 
           // img elements
           if ($element.is('img')) if ($element.attr ('src')) { //$
@@ -466,16 +468,15 @@
         // if (1 || (Object.keys (innerImagesSrcs).length > 0)) {
         if (spin = self.dataset.spin) {
 
-          var customSpinnerID = self.dataset.spinElement
+          var customSpinner = document.getElementById (self.dataset.spinElement)
 
-          if (customSpinnerID) {
+          if (customSpinner) {
 
             // use custom spinner
 
-            var $spinElement = $ ('#' + customSpinnerID).clone ().css ({ //$
-              'position': 'absolute',
-              'display': 'block'
-            })
+            $spinElement = $ (customSpinner.cloneNode (true))
+            $spinElement.get(0).style.position = 'absolute'
+            $spinElement.get(0).style.display = 'block'
 
           } else {
 
@@ -500,7 +501,7 @@
 
             spinnerFadeDuration = duration
 
-            var $spinElement = $ ( //$
+            $spinElement = $ ( //$
               spinnerCode (spinnerRadius, spinnerColor, spinnerBackwards, spinnerPeriod, spinnerFadeDuration)
             )
 
@@ -514,7 +515,7 @@
           $spinElement.get(0).classList.add ('emerge-spin-element')
 
           $(self).before ($spinElement) //$
-          $(self).data ('_spinner', $spinElement) //$
+          spinner.set (self, $spinElement.get(0))
 
         }
       // }
@@ -537,10 +538,10 @@
         for (var i in innerItems) {
           log ('item to load: ' + innerItems[i]) //:dev
           elementsCount ++
-          var $element = innerItems[i]['item']
+          var $element = innerItems[i]['item'] //$
           var event = innerItems[i]['event']
           log ('readyState: ' + $element[0].readyState) //:dev
-          if ($element[0].readyState >= 4) {
+          if ($element[0].readyState >= 4) { //$
             // this is for video only
             element ()
           } else {
