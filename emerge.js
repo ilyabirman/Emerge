@@ -234,7 +234,8 @@
     // starts watching scrolling
     var watchScrolling = function () {
       if (!watchingScrolling) {
-        $ (window).on ('scroll resize', scrolled) //$
+        window.addEventListener ('scroll', scrolled)
+        window.addEventListener ('resize', scrolled)
         watchingScrolling = true
         log ('now watching scrolling') //:dev
       }
@@ -531,7 +532,8 @@
           if (imageToWaitFor.width > 0) {
             element ()
           } else {
-            $ (imageToWaitFor).on ('load error', element) //$
+            imageToWaitFor.addEventListener ('load', element)
+            imageToWaitFor.addEventListener ('error', element)
           }
         })
 
@@ -544,7 +546,7 @@
             // this is for video only
             element ()
           } else {
-            $ (inner.item).on (inner.event, element) //$
+            inner.item.addEventListener (inner.event, element)
           }
         })
 

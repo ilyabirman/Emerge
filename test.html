@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <script src="jquery/jquery.js"></script>
+  <meta charset="utf-8">
   <script src="spin/spin.js"></script>
   <script src="emerge.js"></script>
 </head>
@@ -91,7 +91,7 @@ to { transform: rotate(360deg); }
     hwaccel: true
   })
 
-  spinner.spin ($ ('#spinjs-spinner div')[0])
+  spinner.spin (document.querySelector ('#spinjs-spinner div'))
 
 </script>
 
