@@ -2,17 +2,17 @@
 ;(function () {
   var ready = function (callback) {
     if (document.readyState !== 'loading') {
-      callback();
+      callback ()
     } else {
-      document.addEventListener(
+      document.addEventListener (
         'readystatechange',
         function () {
           if (document.readyState === 'interactive') {
-            callback();
+            callback ()
           }
         },
         {passive: true}
-      );
+      )
     }
   }
 
@@ -47,8 +47,10 @@
 
     var spinnerCode = function (radius, color, backwards, period, fadeDuration) {
       var animationName = 'emergeRotate' + (++ animationNameIndex)
-      return (
-        '<div style="position: absolute; transition: opacity ' + fadeDuration + 'ms ease-out">' +
+      const spinner = document.createElement ('div');
+      spinner.style.position = 'absolute'
+      spinner.style.transition = `opacity ${fadeDuration}ms ease-out`
+      spinner.innerHTML = (
         '<style>' +
         '@keyframes ' + animationName + ' { ' +
         'from { transform: rotate(' + (backwards*360) + 'deg) } ' +
@@ -66,9 +68,10 @@
         '" /></mask></defs>'+
         '<circle r="50" cx="50" cy="50" mask="url(#cut)" fill="' + color + '" stroke="none" />'+
         '</svg>' +
-        '</div>' +
         '</div>'
       )
+
+      return spinner;
     }
 
     var log = function (txt) {  //:dev
@@ -83,7 +86,7 @@
       var bodyHeight = Math.min (
         document.body.clientHeight, document.documentElement.clientHeight
       )
-      var position = el.getBoundingClientRect().top;
+      var position = el.getBoundingClientRect ().top;
       var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       return (position - scrollTop) < bodyHeight
     }
@@ -107,7 +110,7 @@
         log ('in view: ' + el.id)  //:dev
       }
 
-      if (hold && !elementsOnHold.includes(el)) {
+      if (hold && !elementsOnHold.includes (el)) {
         elementsOnHold.push (el)
         log ('   hold: ' + el.id + ' (' + hold + ' ms)') //:dev
         setTimeout (function () {
@@ -116,7 +119,7 @@
         }, hold)
         return false
       }
-      if (elementsOnHold.includes(el) && !shouldGo) {
+      if (elementsOnHold.includes (el) && !shouldGo) {
         log ('on hold: ' + el.id) //:dev
         return false
       }
@@ -134,7 +137,7 @@
 
       var style2 = el.dataset['style-2']
       if (style2) {
-        el.setAttribute('style', el.getAttribute('style') + '; '  + style2)
+        el.setAttribute ('style', el.getAttribute ('style') + '; '  + style2)
       }
 
       log ('  FIRED! ' + el.id) //:dev
@@ -164,9 +167,9 @@
       */
 
       // for (var i in queue) {
-      queue.forEach(function (el) {
+      queue.forEach (function (el) {
 
-        if (elementsFired.includes(el)) {
+        if (elementsFired.includes (el)) {
 
           log ('  fired earlier: ' + el.id)  //:dev
           // log (elementsFired)  //:dev
@@ -177,13 +180,13 @@
           var deadlock = false
 
           if (test_el = waitFor.get (el)) {
-            if (!elementsOnHold.includes(el)) {      //:dev
+            if (!elementsOnHold.includes (el)) {      //:dev
               log ('  waits: ' + el.id)              //:dev
             }                                        //:dev
 
             // check for a deadlock
             while (true) {
-              if (!elementsFired.includes(test_el)) {
+              if (!elementsFired.includes (test_el)) {
 
                 log ('     for ' + test_el.id) //:dev
 
@@ -200,7 +203,7 @@
             }
 
             if (
-              (elementsFired.includes(waitFor.get (el)))
+              (elementsFired.includes (waitFor.get (el)))
               || deadlock
             ) {
               fire (el)
@@ -247,10 +250,11 @@
       var prevs = new WeakMap ()
       var prev;
 
-      document.querySelectorAll ('.emerge').forEach(function (self) {
+      document.querySelectorAll ('.emerge').forEach (function (self) {
 
-        var innerImagesSrcs = {} // should be an object to keep unique sources
+        var innerImagesSrcs = {} // should be an object to keep sources unique
         var innerItems = []
+        var box = self.getBoundingClientRect ()
         var spin = false
         var spinnerRadius = 12
         var spinnerPeriod = 1333
@@ -269,7 +273,7 @@
         var enqueue = function () {
 
           if (self.dataset.continue) {
-            waitFor.set (self, prevs.get(self))
+            waitFor.set (self, prevs.get (self))
           }
 
           if (self.dataset.await) {
@@ -379,7 +383,7 @@
 
           if (fxData) {
 
-            cssPrefixes.forEach(function (prefix) {
+            cssPrefixes.forEach (function (prefix) {
               style1 += (
                 prefix + cssTransform + ': ' + fxData.one + '; ' +
                 prefix + cssTransformOrigin + ': ' + fxData.orn +  '; '
@@ -402,7 +406,7 @@
 
         if (!style1) style1 = self.dataset['style-1']
         if (style1) {
-          self.setAttribute('style', self.getAttribute('style') + '; ' + style1)
+          self.setAttribute ('style', self.getAttribute ('style') + '; ' + style1)
         }
 
 
@@ -419,8 +423,9 @@
           }
 
           // css properties with images
+          const css = getComputedStyle (element)
           cssImageProps.forEach (function (key) {
-            var value = $(element).css (key) //$
+            var value = css[key]
             var pos = -1
             var match
             if (value && ((pos = value.indexOf ('url(')) >= 0)) {
@@ -499,16 +504,15 @@
 
             spinnerFadeDuration = duration
 
-            spinElement = $ ( //$
-              spinnerCode (spinnerRadius, spinnerColor, spinnerBackwards, spinnerPeriod, spinnerFadeDuration)
-            ).get(0)
+            spinElement = spinnerCode (spinnerRadius, spinnerColor, spinnerBackwards, spinnerPeriod, spinnerFadeDuration)
 
           }
 
-          $(spinElement).css ({ //$
-            'width': '100%',//$(self).width (),
-            'height': Math.min ($(self).height (), document.body.clientHeight - $(self).offset ().top) //$
-          })
+          spinElement.style.width = '100%' // $(self).width (),
+          spinElement.style.height = Math.min (
+            box.height, // jQuery calculates height regardless of scale, but not offset
+            document.body.clientHeight - (self.getBoundingClientRect ().top + window.pageYOffset)
+          ) + 'px'
 
           spinElement.classList.add ('emerge-spin-element')
 
@@ -518,9 +522,8 @@
         }
       // }
 
-
         // wait for all inner images
-        Object.keys(innerImagesSrcs).forEach (function (src) {
+        Object.keys (innerImagesSrcs).forEach (function (src) {
           log ('image to load: ' + src) //:dev
           var imageToWaitFor = new Image ()
           imageToWaitFor.src = src
@@ -587,7 +590,7 @@
     play ()
   })
 
-  const style = document.createElement('style')
+  const style = document.createElement ('style')
   style.innerHTML = '.emerge { opacity: 0; }'
-  document.head.append(style)
-}());
+  document.head.append (style)
+} ());
