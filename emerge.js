@@ -64,12 +64,9 @@
   }                           //:dev
 
   function withinView(el) {
-    // log ('________ noview: ' + $el[0].id) //:dev
-    // log ('________ window height = ' + document.body.clientHeight) //:dev
-    // log ('________ window height = ' + document.documentElement.clientHeight) //:dev
-    // log ('________ element top = ' + ($el.offset ().top - document.body.scrollTop)) //:dev
     const bodyHeight = Math.min (
-      document.body.clientHeight, document.documentElement.clientHeight
+      document.body.clientHeight,
+      document.documentElement.clientHeight
     )
     const position = el.getBoundingClientRect ().top
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop
@@ -77,7 +74,7 @@
   }
 
   // calling fire means:
-  // element $el is has all content loaded and can be shown,
+  // element el is has all content loaded and can be shown,
   // also there is no other element that prevents it from being shown,
   // so check if it has its own limitations like hold timeout or scrolling
   function fire(el, shouldGo) {
@@ -142,14 +139,6 @@
     } else { //:dev
       log ('ARM') //:dev
     }
-
-    /*
-    var queueStr = '' //:dev
-    for (var i in queue) { //:dev
-      queueStr += queue[i][0].id + ' ' //:dev
-    } //:dev
-    log ('  queue: ' + queueStr) //:dev
-    */
 
     queue.forEach (function (el) {
 
@@ -293,7 +282,6 @@
       }
 
       if (expose) { //:dev
-        // log ('expose element: ' + self.id) //:dev
         watchScrolling ()
       } //:dev
 
@@ -426,29 +414,11 @@
           })
         }
 
-        // if ($element.is('.emerge-item')) {
-        //   log ('emerge item to load: ' + $element[0]) //:dev
-        //   var event = $element.data ('event')
-        //   if (event == '') event = 'canplaythrough'
-        //   if (event = $element.data ('event')) {
-        //     log ('emerge item load event: ' + event) //:dev
-        //     innerItems.push ({
-        //       'item': $element,
-        //       'event': event
-        //     })
-        //     // elementsCount ++
-        //     // $element.on (event, element)
-        //   } else { //:dev
-        //     log ('no event') //:dev
-        //   }
-        // }
-
       })
 
 
       // start spinner, if necessary and possible
 
-      // if (1 || (Object.keys (innerImagesSrcs).length > 0)) {
       if (self.dataset.spin) {
         let spinElement
 
@@ -487,7 +457,7 @@
 
         }
 
-        spinElement.style.width = '100%' // $(self).width (),
+        spinElement.style.width = '100%'
         spinElement.style.height = Math.min (
           box.height, // jQuery calculates height regardless of scale, but not offset
           document.body.clientHeight - (self.getBoundingClientRect ().top + window.pageYOffset)
@@ -499,7 +469,6 @@
         spinner.set (self, spinElement)
 
       }
-    // }
 
       // wait for all inner images
       Object.keys (innerImagesSrcs).forEach (function (src) {
