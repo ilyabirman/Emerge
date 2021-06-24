@@ -398,9 +398,8 @@
         const css = getComputedStyle (element)
         cssImageProps.forEach (function (key) {
           const value = css[key]
-          let pos = -1
           let match
-          if (value && ((pos = value.indexOf ('url(')) >= 0)) {
+          if (value && (value.indexOf ('url(') !== -1)) {
             while ((match = cssUrlRegex.exec (value)) !== null) {
               if (!cached (match[2])) {
                 innerImagesSrcs[match[2]] = true
