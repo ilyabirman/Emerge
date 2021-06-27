@@ -20,6 +20,11 @@
   ]
   const cssUrlRegex = /url\(\s*(['"]?)(.*?)\1\s*\)/g
 
+  const spinnerKeyframe = [
+    {transform: 'rotate(0deg)'},
+    {transform: 'rotate(360deg)'}
+  ];
+
   function cached(src) {
     const img = new Image ()
     img.src = src
@@ -54,8 +59,12 @@
     `;
 
     spinner.querySelector ('polygon').animate (
-      [{transform: `rotate(${!backwards * 360}deg)`}],
-      {duration: period, iterations: Infinity}
+      spinnerKeyframe,
+      {
+        duration: period,
+        iterations: Infinity,
+        direction: backwards ? 'reverse' : 'normal'
+      }
     );
 
     return spinner;
@@ -535,25 +544,23 @@
 
   })
 
-  function ready(callback) {
-    if (document.readyState !== 'loading') {
-      callback ()
-    } else {
-      document.addEventListener (
-        'readystatechange',
-        function () {
-          if (document.readyState === 'interactive') {
-            callback ()
-          }
-        },
-        {passive: true}
-      )
-    }
-  }
-
-  ready (play)
-
   const style = document.createElement ('style')
   style.innerHTML = '.emerge { opacity: 0; }'
   document.head.append (style)
+
+  // play when the document is ready
+
+  if (document.readyState !== 'loading') {
+    play ()
+  } else {
+    document.addEventListener (
+      'readystatechange',
+      function () {
+        if (document.readyState === 'interactive') {
+          play ()
+        }
+      },
+      {passive: true}
+    )
+  }
 } ());
