@@ -496,6 +496,15 @@
 
   }
 
+  // skip unsupported browsers
+
+  if (
+    window.IntersectionObserver === undefined ||
+    document.documentElement.animate === undefined
+  ) {
+    return;
+  }
+
   if (window.navigator && (window.navigator.loadPurpose === 'preview')) {
     document.querySelectorAll ('.emerge').forEach (function (element) {
       element.style.transition = 'none'
