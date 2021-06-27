@@ -425,18 +425,18 @@
 
           // use built-in spinner
 
-          if (self.dataset['spin-size']) {
-            spinnerRadius = self.dataset['spin-size'] / 2
+          if (self.dataset.spinSize) {
+            spinnerRadius = self.dataset.spinSize / 2
           }
-          if (self.dataset['spin-color']) {
-            spinnerColor = self.dataset['spin-color']
+          if (self.dataset.spinColor) {
+            spinnerColor = self.dataset.spinColor
           }
-          if (self.dataset['spin-period']) {
-            spinnerPeriod = self.dataset['spin-period']
+          if (self.dataset.spinPeriod) {
+            spinnerPeriod = self.dataset.spinPeriod
           }
-          if (self.dataset['spin-direction']) {
+          if (self.dataset.spinDirection) {
             spinnerBackwards = (
-              self.dataset['spin-direction'] === 'clockwise'
+              self.dataset.spinDirection === 'clockwise'
               ? 0
               : 1
             )
