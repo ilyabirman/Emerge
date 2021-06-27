@@ -6,8 +6,6 @@
   let elementsFired
   let elementsOnHold
 
-  let watchingScrolling
-
   const waitingForView = new WeakMap ()
   const waitFor = new WeakMap ()
   const spinner = new WeakMap ()
@@ -197,33 +195,21 @@
 
   }
 
-  // does stuff when scrolled
-  function scrolled() {
-    queue.forEach (function (el) {
-      if (waitingForView.has (el) && withinView (el)) {
-        log ('SCROLLED') //:dev
-        waitingForView.delete (el)
-        fire (el)
+  const viewWatcher = new IntersectionObserver (function (entries, watcher) {
+    entries.forEach (function (entry) {
+      if (entry.isIntersecting || withinView (entry.target)) {
+        waitingForView.delete (entry.target)
+        watcher.unobserve (entry.target)
+        fire (entry.target)
       }
     })
-  }
-
-  // starts watching scrolling
-  function watchScrolling() {
-    if (!watchingScrolling) {
-      window.addEventListener ('scroll', scrolled)
-      window.addEventListener ('resize', scrolled)
-      watchingScrolling = true
-      log ('now watching scrolling') //:dev
-    }
-  }
+  })
 
   function play() {
 
     queue = []
     elementsFired = []
     elementsOnHold = []
-    watchingScrolling = false
 
     const prevs = new WeakMap ()
     let prev;
@@ -286,7 +272,7 @@
       }
 
       if (expose) { //:dev
-        watchScrolling ()
+        viewWatcher.observe (self)
       } //:dev
 
       if (effect) {
