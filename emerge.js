@@ -30,7 +30,7 @@
   function spinnerCode(radius, color, backwards, period, fadeDuration) {
     const diameter = radius * 2
     const spinner = document.createElement ('div');
-    Object.assign(
+    Object.assign (
       spinner.style,
       {
         position: 'absolute',
@@ -53,7 +53,7 @@
       </svg>
     `;
 
-    spinner.querySelector('polygon').animate(
+    spinner.querySelector ('polygon').animate (
       [{transform: `rotate(${!backwards * 360}deg)`}],
       {duration: period, iterations: Infinity}
     );
@@ -155,7 +155,7 @@
         let deadlock = false
 
         if (test_el = waitFor.get (el)) {
-          if (!elementsOnHold.includes (el)) {      //:dev
+          if (!elementsOnHold.includes (el)) {     //:dev
             log ('  waits: ' + el.id)              //:dev
           }                                        //:dev
 
@@ -374,9 +374,10 @@
       ;[self].concat (Array.from (self.querySelectorAll ('*'))).forEach (function (element) {
 
         // img elements
-        if (element.nodeName.toLowerCase () === 'img') if (element.getAttribute ('src')) {
-          if (!cached (element.getAttribute ('src'))) {
-            innerImagesSrcs[element.getAttribute ('src')] = true
+        if (element.nodeName.toLowerCase () === 'img') {
+          const url = element.getAttribute ('src')
+          if (url && !cached (url)) {
+            innerImagesSrcs[url] = true
           }
         }
 
