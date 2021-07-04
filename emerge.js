@@ -121,6 +121,9 @@
     if (spinElement) {
       spinElement.style.opacity = 0
       setTimeout (function () {
+        if (el.parentNode.style.position === 'relative') {
+          el.parentNode.style.position = null
+        }
         spinElement.remove ()
       }, defaultDuration)
     }
@@ -464,6 +467,9 @@
 
         spinElement.classList.add ('emerge-spin-element')
 
+        if (getComputedStyle(self.parentNode).position === 'static') {
+          self.parentNode.style.position = 'relative';
+        }
         self.parentNode.insertBefore (spinElement, self)
         spinner.set (self, spinElement)
 
