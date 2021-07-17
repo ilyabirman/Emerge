@@ -23,7 +23,23 @@
   const spinnerKeyframe = [
     {transform: 'rotate(0deg)'},
     {transform: 'rotate(360deg)'}
-  ];
+  ]
+
+  function ready (callback) {
+    if (document.readyState !== 'loading') {
+      callback ()
+    } else {
+      document.addEventListener (
+        'readystatechange',
+        function () {
+          if (document.readyState === 'interactive') {
+            callback ()
+          }
+        },
+        {passive: true}
+      )
+    }
+  }
 
   function cached(src) {
     const img = new Image ()
@@ -34,7 +50,7 @@
 
   function spinnerCode(radius, color, backwards, period, fadeDuration) {
     const diameter = radius * 2
-    const spinner = document.createElement ('div');
+    const spinner = document.createElement ('div')
     Object.assign (
       spinner.style,
       {
@@ -56,7 +72,7 @@
         </defs>
         <circle r="50" cx="50" cy="50" mask="url(#cut)" fill="${color}" stroke="none" />
       </svg>
-    `;
+    `
 
     spinner.querySelector ('polygon').animate (
       spinnerKeyframe,
@@ -65,9 +81,9 @@
         iterations: Infinity,
         direction: backwards ? 'reverse' : 'normal'
       }
-    );
+    )
 
-    return spinner;
+    return spinner
   }
 
   function log(txt) {         //:dev
@@ -224,7 +240,7 @@
     elementsOnHold = []
 
     const prevs = new WeakMap ()
-    let prev;
+    let prev
 
     document.querySelectorAll ('.emerge').forEach (function (self) {
 
@@ -517,7 +533,7 @@
     window.IntersectionObserver === undefined ||
     document.documentElement.animate === undefined
   ) {
-    return;
+    return
   }
 
   if (window.navigator && (window.navigator.loadPurpose === 'preview')) {
@@ -528,45 +544,39 @@
     return false
   }
 
-  document.querySelectorAll ('.emerge-replay').forEach (function (element) {
-
-    element.addEventListener ('click', function () {
-
-      log ('REPLAY') //:dev
-      // clearAllTimeouts ()?
-      // actually, it works even without it
-      document.querySelectorAll ('.emerge').forEach (function (element) {
-        element.style.transition = 'none'
-        element.style.opacity = 0
-      })
-      document.querySelectorAll ('.emerge').forEach (function (element) {
-        element.remove ()
-      });
-
-      play ()
-      return false
-
-    })
-
-  })
-
   const style = document.createElement ('style')
   style.innerHTML = '.emerge { opacity: 0; }'
   document.head.append (style)
 
   // play when the document is ready
 
-  if (document.readyState !== 'loading') {
+  ready (function () {
+
     play ()
-  } else {
-    document.addEventListener (
-      'readystatechange',
-      function () {
-        if (document.readyState === 'interactive') {
-          play ()
-        }
-      },
-      {passive: true}
-    )
-  }
+
+    document.querySelectorAll ('.emerge-replay').forEach (function (element) {
+
+      element.addEventListener ('click', function (event) {
+
+        event.preventDefault ()
+
+        log ('REPLAY') //:dev
+        // clearAllTimeouts ()?
+        // actually, it works even without it
+        document.querySelectorAll ('.emerge').forEach (function (element) {
+          element.style.transition = null
+          element.style.opacity = null
+        })
+        document.querySelectorAll ('.emerge-spin-element').forEach (function (element) {
+          element.remove ()
+        })
+
+        play ()
+
+      })
+
+    })
+
+  })
+
 } ());
