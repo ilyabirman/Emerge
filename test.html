@@ -1,57 +1,198 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
   <script src="spin/spin.js"></script>
   <script src="emerge.js"></script>
+
+  <style>
+      .row {
+        display: flex;
+        flex-flow: row wrap;
+      }
+      .row h3 {
+        flex: 1 0 100%;
+      }
+  </style>
 </head>
 
 <body>
 
-<h1>Test</h1>
+<h1>Tests</h1>
 
-<svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" viewBox="0 0 38 38" stroke="#fff">
-    <g fill="none" fill-rule="evenodd">
-        <g transform="translate(1 1)" stroke-width="2">
-            <circle stroke-opacity=".5" cx="18" cy="18" r="18"/>
-            <path d="M36 18c0-9.94-8.06-18-18-18">
-                <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="1s" repeatCount="indefinite"/>
-            </path>
-        </g>
-    </g>
-</svg>
+<button class="emerge-replay" href="">replay</button>
 
-<style>
-/*@-webkit-keyframes a {
-from { -webkit-transform: rotate(0deg); }
-to { -webkit-transform: rotate(360deg); }
-}
-@keyframes a { 
-from { transform: rotate(0deg); }
-to { transform: rotate(360deg); }
-}
-*/</style>
+<h2>Basic</h2>
 
+<figure class="emerge">
+    <img width=100 height=100 />
+    <figcaption>Appears immediately.</figcaption>
+</figure>
 
-<!-- Ring test:
-<div style="outline: 1px #fff solid">
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="-webkit-animation: a 1333ms linear infinite; animation: a 1333ms linear infinite; outline: 1px #fff solid"><path fill="#fff" d="M0 0h24v24H0z"/><path fill="#231F20" d="M17.25 1.5c-.14-.06-.28-.11-.44-.11-.55 0-1 .45-1 1 0 .39.23.72.56.89l-.01.01c3.2 1.6 5.39 4.9 5.39 8.71 0 5.38-4.37 9.75-9.75 9.75S2.25 17.39 2.25 12c0-3.82 2.2-7.11 5.39-8.71v-.02c.33-.16.56-.49.56-.89 0-.55-.45-1-1-1-.16 0-.31.05-.44.11C2.9 3.43.25 7.4.25 12c0 6.49 5.26 11.75 11.75 11.75S23.75 18.49 23.75 12c0-4.6-2.65-8.57-6.5-10.5z"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1333ms" repeatCount="indefinite"/></path></svg>
-</div>
- -->
+<h2>Order and timing</h2>
 
-<!-- <p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p><p>1</p>
- -->
+<section class="row">
+    <h3>hold</h3>
 
-<a class="emerge-replay" href="">replay</a>
+    <figure id="hold-100" class="emerge" data-hold="100">
+        <img width=100 height=100 />
+        <figcaption>100</figcaption>
+    </figure>
 
-<div id="vidosick" class="emerge" data-continue="true" data-effect="zoom" data-hold="1000" data-duration="333" data-spin="true" data-spin-size="32" data-spin-color="#f00" data-spin-elements="awesome-spinner" style="width: 320px; height: 568px; background: #fff; margin: auto">
-  <video id="angstrom-svideo" width="320" height="568" preload="auto" poster="" autobuffer style="position: absolute; left: 0; top: 0" class="emerge-item" data-event="canplaythrough">
-    <source src="http://ibs8x/projects/angstrom/v/angstrom.mp4" type="video/mp4" />
-    <source src="http://ibs8x/projects/angstrom/v/angstrom.webm" type="video/webm" />
-    <img src="http://ibs8x/projects/angstrom/i/ss1@2x.png" width="320" height="568" />
-  </video>
-</div>
+    <figure id="hold-200" class="emerge" data-hold="200">
+        <img width=100 height=100 />
+        <figcaption>200</figcaption>
+    </figure>
+
+    <figure id="hold-250" class="emerge" data-hold="250">
+        <img width=100 height=100 />
+        <figcaption>250</figcaption>
+    </figure>
+
+    <figure id="hold-300" class="emerge" data-hold="300">
+        <img width=100 height=100 />
+        <figcaption>300</figcaption>
+    </figure>
+</section>
+
+<section class="row">
+    <h3>continue</h3>
+
+    <figure id="continue-1" class="emerge" data-hold="100" data-continue="true">
+        <img width=100 height=100 />
+        <figcaption>100</figcaption>
+    </figure>
+
+    <figure id="continue-2" class="emerge" data-hold="100" data-continue="true">
+        <img width=100 height=100 />
+        <figcaption>100</figcaption>
+    </figure>
+
+    <figure id="continue-3" class="emerge" data-hold="100" data-continue="true">
+        <img width=100 height=100 />
+        <figcaption>100</figcaption>
+    </figure>
+
+    <figure id="continue-4" class="emerge" data-hold="100" data-continue="true">
+        <img width=100 height=100 />
+        <figcaption>100</figcaption>
+    </figure>
+</section>
+
+<h2>Await</h2>
+
+<section class="row">
+    <h3>after last one</h3>
+
+    <figure id="fitst-awaits-last" class="emerge" data-hold="200" data-await="the-last">
+        <img width=100 height=100 />
+        <figcaption>first</figcaption>
+    </figure>
+
+    <figure id="second-awaits-last" class="emerge" data-hold="200" data-await="the-last">
+        <img width=100 height=100 />
+        <figcaption>second</figcaption>
+    </figure>
+
+    <figure id="third-awaits-last" class="emerge" data-hold="200" data-await="the-last">
+        <img width=100 height=100 />
+        <figcaption>third</figcaption>
+    </figure>
+
+    <figure id="the-last" class="emerge" data-hold="300">
+        <img width=100 height=100 />
+        <figcaption>last</figcaption>
+    </figure>
+</section>
+
+<h2>Spinners</h2>
+
+<section class="row">
+    <h3>size</h3>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" width=100 height=100 />
+        <figcaption>24px (default)</figcaption>
+    </figure>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" data-spin-size="50" width=100 height=100 />
+        <figcaption>50px</figcaption>
+    </figure>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" data-spin-size="10" width=100 height=100 />
+        <figcaption>10px</figcaption>
+    </figure>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" data-spin-size="35" width=100 height=100 />
+        <figcaption>35px</figcaption>
+    </figure>
+</section>
+
+<section class="row">
+    <h3>color</h3>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" width=100 height=100 />
+        <figcaption>kinda black (default)</figcaption>
+    </figure>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" data-spin-color="red" width=100 height=100 />
+        <figcaption>red</figcaption>
+    </figure>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" data-spin-color="#f40" width=100 height=100 />
+        <figcaption>#f40</figcaption>
+    </figure>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" data-spin-color="rgba(50, 50, 50, 0.5)" width=100 height=100 />
+        <figcaption>rgba(50, 50, 50, 0.5)</figcaption>
+    </figure>
+</section>
+
+<section class="row">
+    <h3>period</h3>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" width=100 height=100 />
+        <figcaption>1333 ms (default)</figcaption>
+    </figure>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" data-spin-period="500" width=100 height=100 />
+        <figcaption>500 ms</figcaption>
+    </figure>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" data-spin-period="2000" width=100 height=100 />
+        <figcaption>2000 ms</figcaption>
+    </figure>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" data-spin-period="5000" width=100 height=100 />
+        <figcaption>5000 ms</figcaption>
+    </figure>
+</section>
+
+<section class="row">
+    <h3>direction</h3>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" width=100 height=100 />
+        <figcaption>clockwise (default)</figcaption>
+    </figure>
+
+    <figure>
+        <img class="emerge" data-hold="86400000" data-spin="true" data-spin-direction="counter-clockwise" width=100 height=100 />
+        <figcaption>counter-clockwise</figcaption>
+    </figure>
+</section>
 
 <p>
   <img
@@ -60,6 +201,7 @@ to { transform: rotate(360deg); }
     src="http://ilyabirman.ru/projects/wireless-dj/2/i/screenshot-2-0@2x.png"
     width="1137"
     height="806"
+    style="width: 100%; height: 100%;"
   />
 </p>
 
@@ -138,38 +280,6 @@ to { transform: rotate(360deg); }
     </g>
 </svg>
 </div>
-
-<!--
-
-<hr />
-
-<div>
-  <div style="position: absolute; left: 50%; top: 50%; margin: -12px">
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#fff" d="M0 0h24v24H0z"/><path fill="#404040" d="M17.25 1.5c-.14-.06-.28-.11-.44-.11-.55 0-1 .45-1 1 0 .39.23.72.56.89l-.01.01c3.2 1.6 5.39 4.9 5.39 8.71 0 5.38-4.37 9.75-9.75 9.75S2.25 17.39 2.25 12c0-3.82 2.2-7.11 5.39-8.71v-.02c.33-.16.56-.49.56-.89 0-.55-.45-1-1-1-.16 0-.31.05-.44.11C2.9 3.43.25 7.4.25 12c0 6.49 5.26 11.75 11.75 11.75S23.75 18.49 23.75 12c0-4.6-2.65-8.57-6.5-10.5z"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1.33s" repeatCount="indefinite" /></path></svg>
-  </div>
-</div>
-
-
-
-
-<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 1000 1000"><path fill="#231F20" d="M675.543 140.485l-19.475 46.155C771.034 244.01 850 362.782 850 500c0 193.3-156.7 350-350 350S150 693.3 150 500c0-137.218 78.966-255.99 193.932-313.36l-19.475-46.155C191.54 205.507 100 342.06 100 500c0 220.914 179.086 400 400 400s400-179.086 400-400c0-157.94-91.54-294.493-224.457-359.515z" /></svg>
-
-<svg width="38" height="38" viewBox="0 0 38 38" xmlns="http://www.w3.org/2000/svg" stroke="#000">
-    <g fill="none" fill-rule="evenodd">
-        <g transform="translate(1 1)" stroke-width="2">
-            <path d="M36 18c0-9.94-8.06-18-18-18">
-                <animateTransform
-                    attributeName="transform"
-                    type="rotate"
-                    from="0 18 18"
-                    to="360 18 18"
-                    dur="1s"
-                    repeatCount="indefinite"/>
-            </path>
-        </g>
-    </g>
-</svg>
--->
 
 </body>
 
