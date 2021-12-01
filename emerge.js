@@ -1,18 +1,13 @@
 //! v.2.0 http://ilyabirman.net/projects/emerge/
-/*jslint browser, devel */   //:dev
-/*global getComputedStyle */ //:dev
+/*jslint browser, devel */                   //:dev
+/*global getComputedStyle, queueMicrotask */ //:dev
 (function () {
     "use strict";
 
     const emerge = "emerge";
     const emergeSpin = "emerge-spin-element";
 
-    let queue;
-    let elementsFired;
-    let elementsOnHold;
-
     const waitingForView = new WeakMap();
-    const waitFor = new WeakMap();
     const spinner = new WeakMap();
 
     const defaultDuration = 500;
@@ -156,117 +151,64 @@
         });
     }
 
-    // calling fire means:
-    // element el is has all content loaded and can be shown,
-    // also there is no other element that prevents it from being shown,
-    // so check if it has its own limitations like hold timeout or scrolling
-    function fire(el, shouldGo) {
-        const hold = el.dataset.hold;
-        const expose = el.dataset.expose;
+    function get_element_to_wait_for(element, previous) {
+        return (
+            element.dataset.await !== undefined
+            ? document.getElementById(element.dataset.await)
+            : (
+                element.dataset.continue !== undefined
+                ? previous
+                : undefined
+            )
+        );
+    }
 
-        if (expose && !withinView(el)) {
-            waitingForView.set(el, true);
-            console.log("on expose:", el.id, `(${expose})`); //:dev
-            return false;
+    function is_cyclic(element) {
+        let next = element;
+        while (next.dataset.await !== undefined) {
+            next = document.getElementById(next.dataset.await);
+            if (next === null) {
+                return false;
+            }
+            if (next === element) {
+                return true;
+            }
         }
+        return false;
+    }
 
-        if (expose) {                       //:dev
-            console.log("in view:", el.id); //:dev
-        }                                   //:dev
-
-        if (hold && !elementsOnHold.includes(el)) {
-            elementsOnHold.push(el);
-            console.log("   hold:", el.id, "(" + hold + " ms)"); //:dev
-            setTimeout(function () {
-                console.log("TIME"); //:dev
-                fire(el, true);
-            }, hold);
-            return false;
-        }
-
-        if (elementsOnHold.includes(el) && !shouldGo) {
-            console.log("on hold:", el.id); //:dev
-            return false;
-        }
-
-        const spinElement = spinner.get(el);
+    function fire(element) {
+        const spinElement = spinner.get(element);
         if (spinElement) {
             spinElement.style.opacity = 0;
             setTimeout(function () {
-                if (el.parentNode.style.position === "relative") {
-                    el.parentNode.style.position = null;
+                if (element.parentNode.style.position === "relative") {
+                    element.parentNode.style.position = null;
                 }
                 spinElement.remove();
             }, defaultDuration);
         }
 
-        el.style.transition = `opacity ${defaultDuration}ms ease-out`;
-        el.style.opacity = 1;
+        element.style.transition = `opacity ${defaultDuration}ms ease-out`;
+        element.style.opacity = 1;
 
-        const style2 = el.dataset["style-2"];
+        const style2 = element.dataset["style-2"];
         if (style2) {
-            el.setAttribute("style", el.getAttribute("style") + "; " + style2);
+            element.setAttribute(
+                "style",
+                element.getAttribute("style") + "; " + style2
+            );
         }
 
-        console.log("  FIRED!", el.id); //:dev
-        elementsFired.push(el);
-
-        arm();
-    }
-
-    // calling arm means:
-    // element which has all content loaded and can be shown,
-    // but maybe there are other elements which it waits for
-    function arm(which) {
-        if (which) {
-            console.log("ARM:    ", which.id); //:dev
-            queue.push(which);
-        } else {                               //:dev
-            console.log("ARM");                        //:dev
-        }
-
-        queue.forEach(function (el) {
-            if (elementsFired.includes(el)) {
-                console.log("  fired earlier:", el.id);  //:dev
-            } else {
-                let test_el;
-                let deadlock = false;
-
-                test_el = waitFor.get(el);
-                if (test_el) {
-                    if (!elementsOnHold.includes(el)) { //:dev
-                        console.log("  waits:", el.id); //:dev
-                    }                                   //:dev
-
-                    // check for a deadlock
-                    while (elementsFired.includes(test_el)) {
-                        console.log("     for", test_el.id); //:dev
-
-                        if (test_el === el) {
-                            console.log("  D’OH, WE HAVE A DEADLOCK!"); //:dev
-                            deadlock = true;
-                            break;
-                        }
-                        test_el = waitFor.get(test_el);
-                    }
-
-                    if (
-                        (elementsFired.includes(waitFor.get(el)))
-                        || deadlock
-                    ) {
-                        fire(el);
-                    }
-                } else {
-                    fire(el);
-                }
-            }
-        });
-        console.log("IDLE"); //:dev
+        console.log("  FIRED!", element.id); //:dev
     }
 
     const viewWatcher = new IntersectionObserver(function (entries, watcher) {
         entries.forEach(function (entry) {
             if (entry.isIntersecting || withinView(entry.target)) {
+                if (waitingForView.has(entry.target)) {
+                    waitingForView.get(entry.target)();
+                }
                 waitingForView.delete(entry.target);
                 watcher.unobserve(entry.target);
                 fire(entry.target);
@@ -275,9 +217,7 @@
     });
 
     function play() {
-        queue = [];
-        elementsFired = [];
-        elementsOnHold = [];
+        const promises = new WeakMap();
 
         getEmergeElements().forEach(function (self, index, emerging) {
             if (
@@ -297,15 +237,10 @@
             let style2 = "";
 
             const effect = self.dataset.effect || false;
-            const expose = self.dataset.expose;
 
             if (self.dataset.opaque) {
                 self.style.opacity = 1;
             }
-
-            if (expose) { //:dev
-                viewWatcher.observe(self);
-            }             //:dev
 
             if (effect) {
                 let fxData = {};
@@ -387,7 +322,6 @@
                 }
 
                 if (fxData) {
-
                     style1 += (
                         `${cssTransform}: ${fxData.one};` +
                         `${cssTransformOrigin}: ${fxData.orn};`
@@ -417,9 +351,11 @@
                 );
             }
 
+            const first = [];
+
             // iterate through inner objects to find images
 
-            Promise.all([self].concat(
+            first.push(Promise.all([self].concat(
                 Array.from(self.querySelectorAll("*"))
             ).reduce(
                 function (sources, element) {
@@ -458,26 +394,52 @@
                     return sources;
                 },
                 []
-            )).then(function () {
-                if (self.dataset.continue && previous !== undefined) {
-                    waitFor.set(self, previous);
-                }
+            )));
 
-                if (self.dataset.await) {
-                    waitFor.set(
-                        self,
-                        document.getElementById(self.dataset.await)
-                    );
-                }
+            const element_to_wait_for = get_element_to_wait_for(self, previous);
+            if (
+                element_to_wait_for !== undefined &&
+                !is_cyclic(self)
+            ) {
+                first.push(new Promise(function (resolve) {
+                    queueMicrotask(function () {
+                        promises.get(element_to_wait_for).then(resolve);
+                    });
+                }));
+            }
 
-                if (waitFor.has(self)) {                     //:dev
-                    console.log(                             //:dev
-                        `         ${self.id} will wait for`, //:dev
-                        waitFor.get(self).id                 //:dev
-                    );                                       //:dev
-                }                                            //:dev
+            let last;
+            const hold = Number(self.dataset.hold);
+            if (self.dataset.expose !== undefined && !withinView(self)) {
+                last = new Promise(function (resolve) {
+                    viewWatcher.observe(self);
+                    waitingForView.set(self, resolve);
+                });
+            } else if (!Number.isNaN(hold)) {
+                last = (function () {
+                    let callback;
+                    const promise = new Promise(function (resolve) {
+                        callback = resolve;
+                    });
+                    return function () {
+                        setTimeout(callback, hold);
+                        return promise;
+                    };
+                }());
+            } else {
+                last = Promise.resolve();
+            }
 
-                arm(self);
+            promises.set(self, Promise.all(first).then(function () {
+                return (
+                    typeof last === "function"
+                    ? last()
+                    : last
+                );
+            }));
+
+            promises.get(self).then(function () {
+                fire(self);
             });
 
             // start spinner, if necessary and possible
