@@ -56,32 +56,25 @@
                 transition: `opacity ${fadeDuration}ms ease-out`
             }
         );
-        element.innerHTML = `
-        <svg
-          width="${diameter}"
-          height="${diameter}"
-          viewBox="0 0 100 100"
-          display="block">
-            <defs>
-                <mask id="cut">
-                    <rect width="100" height="100" fill="white" stroke="none" />
-                    <circle r="40" cx="50" cy="50" fill="black" stroke="none" />
-                    <polygon
-                      points="50,50 100,25 150,50 100,75"
-                      fill="black"
-                      stroke="none"
-                      transform-origin="center center" />
-                </mask>
-            </defs>
-            <circle
-              r="50" cx="50" cy="50"
-              mask="url(#cut)"
-              fill="${color}"
-              stroke="none" />
-        </svg>
-        `;
+        element.innerHTML = (
+            "<svg viewBox='0 0 100 100' display='block'>" +
+            "<defs><mask id='cut'>" +
+            "<rect width='100' height='100' fill='white' stroke='none' />" +
+            "<circle r='40' cx='50' cy='50' fill='black' stroke='none' />" +
+            "<polygon points='50,50 100,25 150,50 100,75' fill='black'" +
+            "stroke='none' transform-origin='center center' />" +
+            "</mask></defs>" +
+            "<circle r='50' cx='50' cy='50' mask='url(#cut)' stroke='none' />" +
+            "</svg>"
+        );
 
-        element.lastElementChild.animate(
+        const svg = element.firstElementChild;
+
+        svg.setAttribute("width", diameter);
+        svg.setAttribute("hight", diameter);
+        svg.lastElementChild.setAttribute("fill", color);
+
+        element.firstElementChild.animate(
             [
                 {transform: "rotate(0turn)"},
                 {transform: "rotate(1turn)"}
