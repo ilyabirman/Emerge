@@ -1,1 +1,5 @@
-{"devDependencies":{"uglify-js":"^3.14.4"}}
+{
+  "devDependencies": {
+    "uglify-js": "^3.14.4"
+  }
+}
