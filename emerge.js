@@ -1,9 +1,6 @@
 //! v.2.0 http://ilyabirman.net/projects/emerge/
-/*jslint browser, devel */                   //:dev
-/*global getComputedStyle, queueMicrotask */ //:dev
+"use strict";
 (function () {
-    "use strict";
-
     const emerge = "emerge";
     const emergeSpin = "emerge-spin-element";
 
@@ -71,7 +68,7 @@
         const svg = element.firstElementChild;
 
         svg.setAttribute("width", diameter);
-        svg.setAttribute("hight", diameter);
+        svg.setAttribute("height", diameter);
         svg.lastElementChild.setAttribute("fill", color);
 
         element.firstElementChild.animate(
@@ -209,10 +206,25 @@
         });
     });
 
-    function play() {
+    const lazy_viewport_watcher = new IntersectionObserver(function (entries) {
+        for (let i = 0; i < entries.length; i += 1) {
+            console.log(entries[i]);
+        }
+    });
+
+    function lazy_load(elements) {
+        console.log(elements.map(el => el.dataset.src));
+        const lazy_elements = elements.filter((element) => element.querySelector("[data-src]") !== null);
+        console.log(lazy_elements);
+        for (let i = 0; i < lazy_elements.length; i += 1) {
+            lazy_viewport_watcher.observe(lazy_elements[i])
+        }
+    }
+
+    function play(elements) {
         const promises = new WeakMap();
 
-        getEmergeElements().forEach(function (self, index, emerging) {
+        elements.forEach(function (self, index, emerging) {
             if (
                 self.dataset.await &&
                 document.getElementById(self.dataset.await) === null
@@ -493,7 +505,9 @@
 
         console.log("REPLAY"); //:dev
 
-        getEmergeElements().forEach(function (element) {
+        const elements = getEmergeElements();
+
+        elements.forEach(function (element) {
             element.style.transition = null;
             element.style.opacity = null;
         });
@@ -502,7 +516,7 @@
             element.remove();
         });
 
-        play();
+        play(elements);
     }
 
     // skip unsupported browsers
@@ -529,7 +543,9 @@
     // play when the document is ready
 
     ready(function () {
-        play();
+        const elements = getEmergeElements();
+        lazy_load(elements);
+        play(elements);
 
         document.querySelectorAll(".emerge-replay").forEach(function (element) {
             element.addEventListener("click", repeat);

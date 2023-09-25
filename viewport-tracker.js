@@ -121,7 +121,6 @@
         
         prev_pos = offset;
         prev_time = time;
-        prev_velocity = (offset - prev_pos) / (time - prev_time);
     }
     
     if (
